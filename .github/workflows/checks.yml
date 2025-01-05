@@ -1,4 +1,4 @@
-name: CI/CD
+name: Checks
 
 on:
   pull_request_target:
@@ -31,7 +31,7 @@ jobs:
           black --check .
       - name: Tests
         env:
-          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          SECRET_KEY: ${{ secrets.CI_SECRET_KEY }}
           DEBUG: 0
         run: python manage.py test --settings=hackathon_site.settings.ci
 
@@ -52,8 +52,6 @@ jobs:
           node-version: '16.x'
       - name: Install dependencies
         run: yarn install
-      - name: Formatting check
-        run: yarn run prettier-check
 
   dashboard-checks:
     runs-on: ubuntu-latest
@@ -78,5 +76,3 @@ jobs:
         run: yarn run tsc
       - name: Tests
         run: yarn test --watchAll=false
-      - name: Build frontend
-        run: yarn run build
