@@ -1,0 +1,11 @@
+{% set dashboard_url=request.build_absolute_uri(url("event:dashboard")) %}
+
+<p>Hello {{ user.first_name|striptags }},</p>
+
+<p>The {{ hackathon_name }} team has reviewed your application, and due to both the high caliber and high volume of applications, we have decided to place your application on the waitlist. You will hear back from us by February 14, 2024, regarding a final application decision.</p>
+
+<p>If you have any questions or concerns, read the FAQ on your <a href="{{ dashboard_url }}">dashboard</a> or feel free to contact us. </p>
+
+<p>Cheers, <br>
+The {{ hackathon_name }} Team
+</p>
