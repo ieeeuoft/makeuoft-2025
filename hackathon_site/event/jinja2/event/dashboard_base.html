@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="backgroundColorDashboard">
+<div class="ombreBackground">
     <div class="container">
         <div class="section">
             <div class="borderTopDiv z-depth-3">
@@ -71,6 +71,10 @@
                         {% if (application.rsvp and using_rsvp) or not using_rsvp %}
                             <p>Make sure you read the <a class="primaryText hoverLink" href="{{ participant_package_link }}" rel="noopener" target="_blank">participant package</a> for all the info regarding
                                 the event, and join our <a class="primaryText hoverLink" href="{{ chat_room_link }}" rel="noopener" target="_blank">{{ chat_room_name }}</a>. Stay tuned for more updates regarding detailed event logistics, and we hope to see you soon!</p> <br />
+                            <div style="margin-bottom: 15px; display: flex; flex-direction: column; align-items: center">
+                                <p>Please show the QR code below to the front desk to sign-in. .</p>
+                                <canvas id="qrcode" style="width: 150px; height: 150px; margin: 10px auto"></canvas>
+                            </div>
                         {% endif %}
                         <p>If you have questions, read the <a class="primaryText hoverLink" href="#faq">FAQ</a>, or feel free to contact us.</p> <br />
 
@@ -139,6 +143,9 @@
             {% if using_teams and (is_registration_open() or application is not none) %}
             <div class="borderTopDiv z-depth-3">
                 <h2 class="formH2">Apply as a team</h2>
+                <div style="background-color: #ffffcc; border-left: 6px solid #ffeb3b; margin-bottom: 15px; padding: 4px 12px">
+                    <p>Note: when accessing our <a href="https://hardware.makeuoft.ca" target="_blank">Hardware Sign out Site</a> to borrow items from our inventory, you'll have to re-create your team on that portal.</p>
+                </div>
                 <p>Have friends you want to work with? Create a team with up to 4 people and we’ll review your applications together.</p>
                 <br />
                 {% if application is none %}
@@ -196,19 +203,26 @@
                 {% endif %}
             </div>
             {% endif %}
+            <div class="borderTopDiv z-depth-3">
+                <h2 class="formH2" id="faq">Browse Our Hardware</h2>
+                <p>Once your team is set up, feel free to preview our hardware selection at <a href="http://hardware.makeuoft.ca" target="_blank">hardware.makeuoft.ca</a>. <br> <br>
+                This site will serve as the central hub for all hardware-related logistics during the makeathon. You'll be able to view our inventory starting <b>February 5 at 11 AM</b>, allowing you to familiarize yourself with what's available. When you're ready to order, the site will accept submissions from <b>February 12 at 11:59 AM</b> until <b>February 16 at 5 PM</b>. Our team will then review and approve your order, taking into account the availability of supplies and your described purpose for the hardware. You'll find more detailed information in the participant package.
+                </p>
+            </div>
+
 
             <div class="borderTopDiv z-depth-3">
                 <h2 class="formH2" id="faq">Application FAQs</h2>
 
                 <p class="faqQuestion">When can I expect to hear back?</p>
-                <p class="faqAnswer">Decisions will be sent out in 2 rounds, tentatively scheduled for MONTH XX and XX.</p>
+                <p class="faqAnswer">Decisions will be sent out in 2 rounds, tentatively scheduled Feb 1 and Feb 12.</p>
 
                 <p class="faqQuestion">Can I compete with a different team than the one I applied with?</p>
                 <p class="faqAnswer">Your team number is just for your application so we can review your team together. It is not deciding and not needed during the event. You have until the event to choose a team and must submit to Devpost with the final team.</p>
 
                 {% if using_teams %}
                 <p class="faqQuestion">I don’t have a team. What can I do?</p>
-                <p class="faqAnswer">All teams competing must have 3 or 4 members, but you do not need a full team in order to apply. We have a channel on {{ chat_room_name }} dedicated to team formation as well as an event scheduled before hacking starts at the event.</p>
+                <p class="faqAnswer">All teams competing must have 3 or 4 members, but you do not need a full team in order to apply. We have a channel on {{ chat_room_name }} dedicated to team formation as well as an event scheduled before hacking starts at the event. The Discord link will be included in your acceptance email.</p>
 
                 <p class="faqQuestion">Are decisions unanimous for a team?</p>
                 <p class="faqAnswer">Due to the large number of applicants and limited number of spots for {{ hackathon_name }}, decisions may not be unanimous. Each member should expect an email regarding their individual decisions.</p>
@@ -226,4 +240,15 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script type="text/javascript">
+        var qrcode = new QRious({
+            element: document.getElementById("qrcode"),
+            value: "{{ user.first_name }};{{ user.last_name }};{{ user.email }}",
+            size: 150,
+        });
+    </script>
 {% endblock %}

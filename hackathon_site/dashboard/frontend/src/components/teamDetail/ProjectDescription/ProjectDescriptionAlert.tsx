@@ -7,7 +7,10 @@ import { minProjectDescriptionLength } from "constants.js";
 const ProjectDescriptionAlert = () => {
     const projectDescription = useSelector(teamSelector)?.project_description;
 
-    if (projectDescription && projectDescription.length < minProjectDescriptionLength) {
+    if (
+        !projectDescription ||
+        (projectDescription && projectDescription.length < minProjectDescriptionLength)
+    ) {
         return (
             <AlertBox
                 data-testid="project-description-alert"

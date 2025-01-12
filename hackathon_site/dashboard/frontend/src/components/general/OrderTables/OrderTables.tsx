@@ -96,28 +96,41 @@ export const GeneralOrderTableTitle = ({
     updatedTime,
     additionalChipFormatting,
 }: GeneralOrderTableTitleProps) => (
-    <div className={styles.titleChip}>
+    <Container className={styles.titleChip} maxWidth={false} disableGutters={true}>
         <Typography variant="h2" className={styles.titleChipText}>
             Order #{orderId}
         </Typography>
 
-        {orderStatus && <ChipStatus status={orderStatus} />}
+        {orderStatus && (
+            <Container
+                className={styles.titleChipSpace}
+                maxWidth={false}
+                disableGutters={true}
+            >
+                <ChipStatus status={orderStatus} />
+            </Container>
+        )}
 
         {createdTime && updatedTime ? (
-            <div style={{ alignSelf: "flex-end" }}>
+            <Container>
                 <Chip
                     label={[<b>Created at: </b>, formatDateTime(createdTime)]}
                     icon={<EditIcon />}
-                    className={`${styles.chipPurple} ${styles.chip}`}
+                    className={`${styles.chipPurple} ${styles.chip} ${
+                        additionalChipFormatting ? styles.chipPadding : ""
+                    }`}
                 />
+                {"    "}
                 <Chip
                     label={[<b>Updated at: </b>, formatDateTime(updatedTime)]}
                     icon={<UpdateIcon />}
-                    className={`${styles.chipBlue} ${styles.chip}`}
+                    className={`${styles.chipBlue} ${styles.chip} ${
+                        additionalChipFormatting ? styles.chipPadding : ""
+                    }`}
                 />
-            </div>
+            </Container>
         ) : null}
-    </div>
+    </Container>
 );
 
 export const GeneralPendingTable = ({

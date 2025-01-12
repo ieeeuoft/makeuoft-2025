@@ -13,8 +13,7 @@ import {
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { teamSizeSelector } from "slices/event/teamSlice";
 import { isTestUserSelector } from "slices/users/userSlice";
-import { projectDescriptionSelector } from "slices/event/teamDetailSlice";
-import { displaySnackbar } from "slices/ui/uiSlice";
+import { projectDescriptionSelector } from "slices/event/teamSlice";
 import {
     hardwareSignOutEndDate,
     hardwareSignOutStartDate,
@@ -33,21 +32,7 @@ const CartSummary = () => {
     const dispatch = useDispatch();
     const onSubmit = () => {
         if (cartQuantity > 0) {
-            if (
-                projectDescription &&
-                projectDescription.length < minProjectDescriptionLength
-            ) {
-                dispatch(
-                    displaySnackbar({
-                        message: "Please provide a more detailed project description.",
-                        options: {
-                            variant: "error",
-                        },
-                    })
-                );
-            } else {
-                dispatch(submitOrder());
-            }
+            dispatch(submitOrder());
         }
     };
     const currentDateTime = new Date();
@@ -75,6 +60,9 @@ const CartSummary = () => {
                     cartQuantity === 0 ||
                     cartOrderLoading ||
                     !teamSizeValid ||
+                    !projectDescription || // Checks if projectDescription is null, undefined, or an empty string
+                    (projectDescription &&
+                        projectDescription.length < minProjectDescriptionLength) ||
                     (!isTestUser && isOutsideSignOutPeriod)
                 }
                 onClick={onSubmit}

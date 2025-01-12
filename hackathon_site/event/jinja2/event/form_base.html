@@ -1,11 +1,11 @@
 {% extends "event/base.html" %}
 
-{% macro render_field(field, show_help_text=False, show_label=True, show_help_text_as_label=False, size="s12") %}
-    <div class="input-field row col {{ size }}">
+{% macro render_field(field, show_help_text=False, show_label=True, show_help_text_as_label=False, size="s12", id="") %}
+    <div class="input-field row col {{ size }}" id="{{ id }}">
         {{ field }}
         {% if show_label %}
             {% if show_help_text_as_label %}
-                <label for="{{ field.id_for_label }}">{{ field.help_text }}</label>
+                <label for="{{ field.id_for_label }}">{{ field.help_text|safe or field.label}}</label>
             {% else %}
                 {{ field.label_tag() }}
             {% endif %}
@@ -45,11 +45,32 @@
     </div>
 {% endmacro %}
 
+{% macro render_radio_field(field, size="s12") %}
+    <div class="row col {{ size }}" style="padding-top: 0.5em; padding-bottom: 0.5em;">
+        {{ field.help_text }}
+        {% for radio in field %}
+            <p>
+                <label for="{{ radio.id_for_label }}">
+                    {{ radio.tag() }}
+                    <span>{{ radio.choice_label }}</span>
+                </label>
+            </p>
+        {% endfor %}
+        {% if field.errors %}
+            <span class="formFieldError col s12">
+            {% for error in field.errors %}
+                {{ error }}
+            {% endfor %}
+            </span>
+        {% endif %}
+    </div>
+{% endmacro %}
+
 {% block body %}
-<div class="backgroundColorFormBase">
+<div class="ombreBackground">
     <div class="container">
         <div class="section">
-            <div class="loginDiv z-depth-3 row">
+            <div class="loginDiv z-depth-1 row">
                 <div class="row col s12 flexColCenter rowMarginPadding {% if self.form_img() %}l7 m8{% endif %}">
                     <h1 class="formH1 col s12">{% block form_title %}{% endblock %}</h1>
                     <div class="row col s12 formPadding" style="width: auto; margin-bottom: 0;">

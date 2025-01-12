@@ -49,18 +49,20 @@ class SetupUserMixin:
             team = RegistrationTeam.objects.create()
 
         application_data = {
-            "birthday": date(2000, 1, 1),
+            "age": "18",
             "gender": "no-answer",
             "ethnicity": "no-answer",
             "phone_number": "1234567890",
             "school": "UofT",
             "study_level": "other",
             "graduation_year": 2020,
-            "q1": "hi",
-            "q2": "there",
-            "q3": "foo",
+            "what_hackathon_experience": "hi",
+            "why_participate": "there",
+            "what_technical_experience": "foo",
             "conduct_agree": True,
-            "data_agree": True,
+            "logistics_agree": True,
+            "email_agree": True,
+            "resume_sharing": True,
             "resume": "uploads/resumes/my_resume.pdf",
             **kwargs,
         }

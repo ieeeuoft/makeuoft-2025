@@ -283,7 +283,7 @@ class TeamDetailView(
     generics.GenericAPIView,
 ):
     serializer_class = TeamSerializer
-    permission_classes = [FullDjangoModelPermissions]
+    # permission_classes = [FullDjangoModelPermissions]
     lookup_field = "team_code"
     queryset = EventTeam.objects.all()
 

@@ -151,11 +151,11 @@ const teamDetailSlice = createSlice({
         builder.addCase(getTeamInfoData.pending, (state) => {
             state.isTeamInfoLoading = true;
             state.teamInfoError = null;
-            state.projectDescription = null;
         });
         builder.addCase(getTeamInfoData.fulfilled, (state, { payload }) => {
             state.isTeamInfoLoading = false;
             state.teamInfoError = null;
+
             state.projectDescription = payload.project_description;
             teamDetailAdapter.setAll(state, payload.profiles);
         });
@@ -184,7 +184,6 @@ const teamDetailSlice = createSlice({
             state.isParticipantIdLoading = false;
             state.participantIdError = payload?.message ?? "Something went wrong";
         });
-
         builder.addCase(updateProjectDescription.pending, (state) => {
             state.isTeamInfoLoading = true;
             state.teamInfoError = null;

@@ -1,14 +1,13 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import {
-    projectDescriptionSelector,
-    isTeamInfoLoadingSelector,
-} from "slices/event/teamDetailSlice";
+import { isTeamInfoLoadingSelector } from "slices/event/teamDetailSlice";
+import { projectDescriptionSelector } from "slices/event/teamDetailSlice";
 import styles from "./ProjectDescription.module.scss";
 import { LinearProgress, Paper, Typography } from "@material-ui/core";
 
 const ProjectDescriptionDetail = () => {
     const projectDescription = useSelector(projectDescriptionSelector);
+    // TODO: move project description redux logic to teamSlice
     const isTeamInfoLoading = useSelector(isTeamInfoLoadingSelector);
 
     return (

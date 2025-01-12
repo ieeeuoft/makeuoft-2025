@@ -84,18 +84,25 @@ class ApplicationFormTestCase(SetupUserMixin, TestCase):
     def setUp(self):
         super().setUp()
         self.data = {
-            "birthday": date(2000, 7, 7),
-            "gender": "no-answer",
-            "ethnicity": "no-answer",
+            "age": "18",
+            "pronouns": "he-him",
+            "gender": "male",
+            "ethnicity": "chinese",
             "phone_number": "1234567890",
+            "country": "canada",
+            "dietary_restrictions": "halal",
+            "tshirt_size": "L",
+            "underrepresented_community": "no",
+            "sexual_orientation": "straight",
             "school": "UofT",
-            "study_level": "other",
-            "graduation_year": 2020,
-            "q1": "hi",
-            "q2": "there",
-            "q3": "foo",
-            "conduct_agree": True,
-            "data_agree": True,
+            "study_level": "gradschool",
+            "graduation_year": "2025",
+            "program": "computer science",
+            "how_many_hackathons": "2",
+            "what_hackathon_experience": "foo",
+            "why_participate": "foo",
+            "what_technical_experience": "foo",
+            "discovery_method": "instagram",
         }
         self.files = self._build_files()
 
@@ -125,7 +132,19 @@ class ApplicationFormTestCase(SetupUserMixin, TestCase):
         return ApplicationForm(user=user, data=data, files=files)
 
     def test_fields_are_required(self):
+        optional_fields = {
+            "linkedin",
+            "github",
+            "devpost",
+            "email_agree",
+            "resume_sharing",
+            "rsvp",
+            "conduct_agree",
+            "logistics_agree",
+        }
         for field in self.data:
+            if field in optional_fields:
+                continue
             bad_data = self.data.copy()
             del bad_data[field]
 
@@ -257,26 +276,6 @@ class ApplicationFormTestCase(SetupUserMixin, TestCase):
         form = self._build_form()
         self.assertFalse(form.is_valid())
         self.assertIn("Registration has closed.", form.non_field_errors())
-
-    def test_invalid_birthday(self):
-        data = self.data.copy()
-        data["birthday"] = (
-            settings.EVENT_START_DATE
-            - relativedelta(years=settings.MINIMUM_AGE - 1, days=360)
-        ).date()
-        form = self._build_form(data=data)
-        self.assertFalse(form.is_valid())
-        self.assertIn(
-            f"You must be {settings.MINIMUM_AGE} to participate.",
-            form.errors["birthday"],
-        )
-
-        data["birthday"] = (
-            settings.EVENT_START_DATE
-            - relativedelta(years=settings.MINIMUM_AGE, days=1)
-        ).date()
-        form = self._build_form(data=data)
-        self.assertTrue(form.is_valid())
 
 
 class JoinTeamFormTestCase(SetupUserMixin, TestCase):

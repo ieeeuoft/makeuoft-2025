@@ -26,8 +26,6 @@ import {
     UserHasBeenGrantedAccessMessage,
 } from "components/acknowledgement/UserAcceptanceStatus/UserAcceptanceStatus";
 import AlertBox from "components/general/AlertBox/AlertBox";
-import { hardwareSignOutStartDate } from "constants.js";
-import { push } from "connected-react-router";
 
 const Acknowledgement = () => {
     const dispatch = useDispatch();
@@ -47,10 +45,11 @@ const Acknowledgement = () => {
     const [showAcknowledgements, setShowAcknowledgements] = useState(false);
 
     useEffect(() => {
-        const today = new Date();
-        if (hardwareSignOutStartDate > today) {
-            push("/404");
-        } else if (userDoesNotHaveRole) {
+        // if (hardwareSignOutStartDate > today) {
+        //     setSignoutNotStarted(true);
+        //     push("/404");
+        // } else
+        if (userDoesNotHaveRole) {
             dispatch(fetchUserAcceptanceStatus());
         }
     }, [dispatch, userDoesNotHaveRole]);
@@ -115,14 +114,16 @@ const SuccessMessage = () => {
         <Grid container justifyContent="center">
             <Grid item lg={6} xs={12}>
                 <Card style={{ padding: "15px 5px" }}>
-                    <Typography style={{ fontSize: "25px" }} align="center">
-                        {`${user?.first_name
-                            .charAt(0)
-                            .toUpperCase()}${user?.first_name.substring(
-                            1
-                        )}, you're ready to get started. We've placed you in Team ${
-                            profile?.team
-                        } but you can leave and join another team anytime.`}
+                    <Typography
+                        style={{ fontSize: "25px", padding: "15px" }}
+                        align="center"
+                    >
+                        🎉 {user?.first_name.charAt(0).toUpperCase()}
+                        {user?.first_name.substring(1)}, you're ready to get started.
+                        <br />
+                        We've placed you in Team <strong>{profile?.team}</strong>
+                        <br />
+                        You can leave and join another team anytime.
                     </Typography>
                     <Box
                         style={{

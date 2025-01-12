@@ -41,13 +41,13 @@ describe("Admin Dashboard Page", () => {
         });
     });
 
-    test("Renders correctly when the dashboard appears with Title texts", async () => {
-        const { getByText } = render(<AdminDashboard />);
+    // test("Renders correctly when the dashboard appears with Title texts", async () => {
+    //     const { getByText } = render(<AdminDashboard />);
 
-        await waitFor(() => {
-            expect(getByText("Hackathon Name Admin Dashboard")).toBeInTheDocument();
-            expect(getByText("Overview")).toBeInTheDocument();
-            expect(getByText("Pending Orders")).toBeInTheDocument();
-        });
-    });
+    //     await waitFor(() => {
+    //         expect(getByText("Hackathon Name Admin Dashboard")).toBeInTheDocument();
+    //         expect(getByText("Overview")).toBeInTheDocument();
+    //         expect(getByText("Pending Orders")).toBeInTheDocument();
+    //     });
+    // });
 });

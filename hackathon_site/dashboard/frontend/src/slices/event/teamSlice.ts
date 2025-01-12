@@ -16,6 +16,7 @@ interface TeamExtraState {
     isJoinTeamLoading: boolean;
     error: string | null;
     team: Team | null;
+    projectDescription: string | null;
 }
 
 export const initialState: TeamExtraState = {
@@ -24,6 +25,7 @@ export const initialState: TeamExtraState = {
     isJoinTeamLoading: false,
     error: null,
     team: null,
+    projectDescription: null,
 };
 
 export const teamReducerName = "participantTeam";
@@ -123,7 +125,7 @@ export const joinTeam = createAsyncThunk<
         const errorData = e.response?.data?.non_field_errors;
         dispatch(
             displaySnackbar({
-                message: `Failed to join the team ${teamCode}`,
+                message: `Failed to join the team ${teamCode}: ${e.response.statusText}`,
                 options: { variant: "error" },
             })
         );
@@ -152,6 +154,7 @@ const teamSlice = createSlice({
                     state.isLoading = false;
                     state.error = null;
                     state.team = payload;
+                    state.projectDescription = payload.project_description;
                 }
             }
         );
@@ -171,6 +174,7 @@ const teamSlice = createSlice({
                 state.isLeaveTeamLoading = false;
                 state.error = null;
                 state.team = payload;
+                state.projectDescription = payload.project_description;
             }
         );
 
@@ -190,6 +194,7 @@ const teamSlice = createSlice({
                 state.isJoinTeamLoading = false;
                 state.error = null;
                 state.team = payload;
+                state.projectDescription = payload.project_description;
             }
         );
 
@@ -241,4 +246,9 @@ export const teamMemberNamesSelector = createSelector(
 export const teamSizeSelector = createSelector(
     [teamSliceSelector],
     (teamSlice) => teamSlice.team?.profiles?.length ?? 0
+);
+
+export const projectDescriptionSelector = createSelector(
+    [teamSliceSelector],
+    (teamSlice) => teamSlice.projectDescription
 );

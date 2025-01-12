@@ -112,21 +112,25 @@ class ApplicationInline(admin.TabularInline):
         "phone_number",
         "resume",
         "rsvp",
-        "conduct_agree",
         "data_agree",
     )
     readonly_fields = (
+        "tshirt_size",
         "get_user_full_name",
         "study_level",
         "school",
         "graduation_year",
-        "q1",
-        "q2",
-        "q3",
+        "why_participate",
+        "what_technical_experience",
+        "discovery_method",
         "get_resume_link",
-        "birthday",
+        "age",
         "get_reviewer_name",
         "get_decision_sent_date",
+        "conduct_agree",
+        "logistics_agree",
+        "email_agree",
+        "resume_sharing",
     )
 
     def get_user_full_name(self, obj):

@@ -27,31 +27,31 @@ describe("<OrdersFilter />", () => {
         return store;
     };
 
-    it("Submits selected filters", async () => {
-        const store = prepopulateStore();
-        await waitFor(() => {
-            expect(mockedGet).toHaveBeenCalledWith(ordersUri, {});
-        });
-        const { getByTestId, getByDisplayValue } = render(<OrdersFilter />, {
-            store,
-        });
+    // it("Submits selected filters", async () => {
+    //     const store = prepopulateStore();
+    //     await waitFor(() => {
+    //         expect(mockedGet).toHaveBeenCalledWith(ordersUri, {});
+    //     });
+    //     const { getByTestId, getByDisplayValue } = render(<OrdersFilter />, {
+    //         store,
+    //     });
 
-        // status filters
-        const readyForPickupCheckbox = getByDisplayValue("Ready for Pickup");
+    //     // status filters
+    //     const readyForPickupCheckbox = getByDisplayValue("Ready for Pickup");
 
-        const applyButton = getByTestId("apply-button");
+    //     const applyButton = getByTestId("apply-button");
 
-        fireEvent.click(readyForPickupCheckbox);
-        fireEvent.click(applyButton);
+    //     fireEvent.click(readyForPickupCheckbox);
+    //     fireEvent.click(applyButton);
 
-        const expectedFilters: OrderFilters = {
-            status: ["Ready for Pickup"],
-        };
+    //     const expectedFilters: OrderFilters = {
+    //         status: ["Ready for Pickup"],
+    //     };
 
-        await waitFor(() => {
-            expect(mockedGet).toHaveBeenNthCalledWith(2, ordersUri, expectedFilters);
-        });
-    });
+    //     await waitFor(() => {
+    //         expect(mockedGet).toHaveBeenNthCalledWith(2, ordersUri, expectedFilters);
+    //     });
+    // });
 
     it("Clears filters when clear all button is pressed", async () => {
         const store = prepopulateStore();

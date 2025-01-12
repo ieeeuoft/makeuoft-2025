@@ -20,7 +20,19 @@
     &Logo {
         display: flex;
         &Img {
-            height: 30px;
+            height: 40px;
+
+            @include responsive(sm-down) {
+                height: 30px;
+                margin-top: 3px;
+            }
+        }
+        &Title {
+            margin: 2px 0 0 -50px;
+
+            @include responsive(sm-down) {
+                margin-left: -65px;
+            }
         }
     }
 

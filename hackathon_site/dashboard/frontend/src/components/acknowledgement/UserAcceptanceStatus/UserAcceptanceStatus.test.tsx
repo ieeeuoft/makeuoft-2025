@@ -86,4 +86,20 @@ describe("<UserAcceptanceStatus/>", () => {
         const getStartedButton = queryByText(/get started/i);
         expect(getStartedButton).not.toBeInTheDocument();
     });
+
+    // it("Shows correct message for NotStarted status", () => {
+    //     const { getByText, queryByText } = render(
+    //         <UserAcceptanceMessage
+    //             status="NotStarted"
+    //             handleGetStarted={handleGetStarted}
+    //         />
+    //     );
+
+    //     expect(getByText(`Hardware Signout Site is not open yet`)).toBeInTheDocument();
+    //     expect(
+    //         getByText(/Please wait for further notice from us, See you soon!/i)
+    //     ).toBeInTheDocument();
+    //     const getStartedButton = queryByText(/get started/i);
+    //     expect(getStartedButton).not.toBeInTheDocument();
+    // });
 });

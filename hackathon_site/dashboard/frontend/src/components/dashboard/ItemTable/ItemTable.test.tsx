@@ -14,7 +14,7 @@ import {
     mockReturnedOrdersInTable,
 } from "testing/mockData";
 import { ReturnOrderInTable } from "api/types";
-import { getAllByText } from "@testing-library/react";
+import { getAllByText, queryAllByText } from "@testing-library/react";
 
 describe("<PendingTables />", () => {
     it("Shows pending items and status chip", () => {

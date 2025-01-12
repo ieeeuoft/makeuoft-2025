@@ -1,22 +1,28 @@
 $colors: (
-    font: #222,
+    font: #333,
     white: #fff,
-    primary: #1976d2,
-    secondary: #ffa000,
-    light: #b7dbff,
-    dark: #002f5e,
-    backgroundColor: #ddeeff,
+    primary: #2b7bbc,
+    secondary: #f0ab3a,
+    light: #f6b94a,
+    dark: #333,
     error: #b00020,
     success: #0b890b,
     primaryOnHover: #08529c,
-    secondaryOnHover: #ce8100,
+    secondaryOnHover: #d2a300,
     errorOnHover: #870000,
     successOnHover: #1d7521,
+    backgroundColor: #ddeeff,
+    errorBackground: #eed6da,
+    successBackground: #e4f1e4,
+    info: #044f9b,
+    infoBackground: #cfe1f1,
+    warning: #af5e00,
+    warningBackground: #e7d2b9,
 );
 
 $fonts: (
     body: "Nunito",
-    header: "Roboto",
+    header: "Montserrat",
 );
 
 $font-sizes: (

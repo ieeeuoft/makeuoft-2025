@@ -106,7 +106,13 @@ export type OrderStatus =
     | "Returned"
     | "Pending"
     | "In Progress";
-export type PartReturnedHealth = "Healthy" | "Heavily Used" | "Broken" | "Lost";
+
+export type PartReturnedHealth =
+    | "Healthy"
+    | "Heavily Used"
+    | "Broken"
+    | "Lost"
+    | "Rejected";
 
 export type ItemsInOrder = Omit<OrderItem, "order" | "time_occurred">;
 
@@ -130,6 +136,7 @@ export interface OrderFilters {
     ordering?: OrderOrdering;
     status?: OrderStatus[];
     search?: string;
+    limit?: number;
 }
 
 /** Sanitized Orders */
@@ -137,6 +144,7 @@ export interface OrderItemTableRow {
     id: number;
     quantityRequested: number;
     quantityGranted: number;
+    quantityGrantedBySystem: number;
 }
 
 export interface OrderInTable {

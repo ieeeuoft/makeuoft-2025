@@ -20,12 +20,9 @@ h3 {
     font-weight: bold;
     text-transform: uppercase;
 }
-
 h1,
 h2,
-h3,
-h4,
-h5 {
+h3 {
     font-family: font(header);
 }
 
@@ -40,26 +37,22 @@ strong {
 }
 // End of general HTML stuff
 
-// Colors
-.backgroundColor {
-    // Change the background colors of each page here!
-    &Landing {
-        background-color: color(backgroundColor);
-    }
-    &FormBase {
-        background-color: color(backgroundColor);
-    }
-    &Dashboard {
-        background-color: color(backgroundColor);
-    }
-
-    &Landing,
-    &FormBase,
-    &Dashboard {
-        min-height: 100vh;
-    }
+// Background color change
+.wrapper {
+    transition: background-color 0.3s ease-out;
 }
 
+.scrollColor {
+    transition: color 0.3s ease-out;
+}
+
+.ombreBackground {
+    background: linear-gradient(180deg, #48a0af 60%, #3386ba 120%);
+    min-height: 100vh;
+}
+// End of background color change
+
+// Colors
 .primaryColor {
     background-color: color(primary) !important;
 }
@@ -76,12 +69,16 @@ strong {
     color: color(secondary) !important;
 }
 
+.fontText {
+    color: color(font) !important;
+}
+
 .errorText {
-    color: color(error);
+    color: color(error) !important;
 }
 
 .successText {
-    color: color(success);
+    color: color(success) !important;
 }
 
 .colorBtn {
@@ -149,7 +146,7 @@ strong {
 // Navbar stuff
 .logoNav {
     height: 100%;
-    padding: 5px;
+    padding: 5px 0;
 }
 
 .logoNavSide {
@@ -160,6 +157,7 @@ strong {
     img {
         height: 100% !important;
         padding: 0 !important;
+        font-family: font(header);
 
         &:hover {
             background-color: transparent !important;
@@ -170,11 +168,30 @@ strong {
 .navbar {
     position: sticky;
     top: 0;
-    z-index: 1100;
+    background-color: transparent;
+    box-shadow: none;
+    transition: background-color 200ms linear, top 200ms ease-in-out;
+    z-index: 998;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 .sidenav-trigger {
     margin-left: 0 !important;
+}
+
+.scrolled {
+    background-color: rgba(66, 153, 178, 0.95);
+    box-shadow: 2px -5px 8px rgba(0, 0, 0, 0.14), 0 -1px 10px -2px rgba(0, 0, 0, 0.12),
+        0 -1px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+// Overwrite some Materialize so the the navbar can fit on one line
+nav ul a {
+    @media (max-width: 1080px) {
+        font-size: 13.5px !important;
+        padding: 0 12px !important;
+    }
 }
 // End of navbar stuff
 
@@ -182,12 +199,102 @@ strong {
 .landingImg {
     @include flexPosition($jusCon: center, $alIte: center);
 
-    img {
+    img,
+    object {
         width: 100%;
+    }
+
+    @include responsive(md-down) {
+        img,
+        object {
+            max-width: 300px;
+        }
     }
 
     @include responsive(sm-down) {
         margin-top: 0;
+    }
+}
+
+.landingBackground {
+    background-image: url("../../images/landing-background.svg");
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center bottom;
+    padding: 100px 0;
+    margin-top: -64px;
+    color: color(white);
+
+    h1 {
+        font-weight: 600;
+    }
+    h4,
+    h5 {
+        font-weight: 400;
+    }
+    h5 {
+        font-family: font(header);
+    }
+
+    @include responsive(md-down) {
+        padding: 60px 0 30px;
+        background-image: url("../../images/landing-background-mobile.svg");
+        h1 {
+            font-size: 50px;
+        }
+        h4 {
+            font-size: 25px;
+        }
+    }
+
+    @include responsive(sm-down) {
+        padding: 0 0 10px;
+        margin-top: -56px;
+        text-align: center;
+        h1 {
+            font-size: 40px;
+        }
+        h4 {
+            font-size: 22px;
+        }
+        h5 {
+            font-size: size(lg);
+        }
+    }
+}
+
+.definition {
+    @include flexPosition($alIte: flex-start);
+    padding: 5px 0 25px;
+    &-shape {
+        clip-path: polygon(0 0, 100% 0%, 90% 100%, 0% 100%);
+        background-color: color(secondary);
+        width: auto;
+        border-radius: 100px 14px 100px 100px;
+        padding: 2px 17px 2px 12px;
+        font-size: 18px;
+        font-size: size(lg);
+        font-style: italic;
+        color: color(font);
+        font-weight: 700;
+    }
+
+    > p {
+        font-weight: 400;
+        margin: 4px 20px 0 15px;
+        text-align: left !important;
+    }
+
+    @include responsive(sm-down) {
+        padding: 5px 0 15px;
+        &-shape {
+            padding: 2px 17px 2px 12px;
+            font-size: 16px;
+        }
+        > p {
+            margin: 2.5px 0 2px 10px;
+            font-size: 16px;
+        }
     }
 }
 // End of landing section
@@ -239,18 +346,26 @@ strong {
 .schedule {
     margin: 10px 0 30px;
 
+    h5 {
+        font-family: font(header);
+        font-weight: 500;
+    }
+
     p {
         font-size: size(xl);
         margin: 0;
     }
 
     &Time {
-        width: 80px;
+        margin-right: 20px !important;
+        font-weight: bold;
+        white-space: nowrap;
     }
 
     &Row {
         display: flex;
-        margin: 10px 0;
+        margin: 10px 0 25px;
+        justify-content: center;
     }
 
     @include responsive(md-down) {
@@ -264,23 +379,9 @@ strong {
 }
 // End of "Schedule" section
 
-// "Sponsors" section
-.sponsorImgs {
-    margin-top: 50px;
-
-    img {
-        height: 100%;
-        width: 100%;
-        max-height: 150px;
-        padding-bottom: 50px;
-    }
-}
-// End of "Sponsors" section
-
 // "Hackathon stats" section
 .stat {
     @include flexPosition($alIte: center, $dir: column);
-
     &-number {
         margin: 10px 0;
         font-weight: 700;
@@ -292,10 +393,22 @@ strong {
 }
 // End of "Hackathon stats" section
 
+// "Sponsors" section
+.sponsorImgs {
+    margin-top: 50px;
+    @include flexPosition($jusCon: center);
+
+    img {
+        width: 100%;
+        padding: 0 20px;
+        max-width: 600px;
+    }
+}
+// End of "Sponsors" section
+
 // "FAQ" section
 .collapsible .active {
-    // color: inherit;
-    color: color(primary);
+    color: inherit;
 }
 
 .active .collapsible-header {
@@ -368,9 +481,6 @@ strong {
         img {
             height: 100%;
             width: 100%;
-            // Manipulate the filter to change the color of the icon.
-            // e.g. invert(0) is black and invert(1) is white
-            filter: invert(1);
         }
 
         &:hover {
@@ -499,8 +609,8 @@ strong {
 
 // Dashboard stuff
 .borderTopDiv {
-    background-color: color(white);
     @include flexPosition($dir: column);
+    background-color: color(white);
     border-top: solid 10px color(secondary);
     border-radius: 3px 3px 0 0;
     padding: 40px 30px 30px;
@@ -523,4 +633,39 @@ strong {
         margin: 5px 0 20px;
     }
 }
+
+.banner {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px;
+    border-style: solid;
+    margin: 10px 0;
+
+    &success {
+        border-color: color(success);
+        background-color: color(successBackground);
+        color: color(success);
+    }
+
+    &error {
+        border-color: color(error);
+        background-color: color(errorBackground);
+        color: color(error);
+    }
+
+    &info {
+        border-color: color(info);
+        background-color: color(infoBackground);
+        color: color(info);
+    }
+
+    &warning {
+        border-color: color(warning);
+        background-color: color(warningBackground);
+        color: color(warning);
+    }
+}
+
 // End of dashboard stuff

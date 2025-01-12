@@ -22,6 +22,7 @@ from django.urls import reverse_lazy
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -61,14 +62,13 @@ else:
         "hardware.makeuoft.ca",
         "www.hardware.makeuoft.ca",
     ]
+
     EMAIL_HOST = os.environ.get("EMAIL_HOST", None)
     EMAIL_PORT = os.environ.get("EMAIL_PORT", None)
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", None)
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", None)
     EMAIL_USE_SSL = True
-    DEFAULT_FROM_EMAIL = os.environ.get(
-        "EMAIL_FROM_ADDRESS", "hello@makeuoft.ca"
-    )
+    DEFAULT_FROM_EMAIL = os.environ.get("EMAIL_FROM_ADDRESS", "hello@makeuoft.ca")
     CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_CREDENTIALS = True
@@ -212,6 +212,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
@@ -312,18 +313,17 @@ LOGGING = {
 }
 
 # Event specific settings
-HACKATHON_NAME = "MakeUofT 2025"
+HACKATHON_NAME = "MakeUofT"
 DEFAULT_FROM_EMAIL = "hello@makeuoft.ca"
 CONTACT_EMAIL = DEFAULT_FROM_EMAIL
 HSS_ADMIN_EMAIL = "hardware@makeuoft.ca"
 
-# TODO: CHANGE
-REGISTRATION_OPEN_DATE = datetime(2020, 9, 1, tzinfo=TZ_INFO)
-REGISTRATION_CLOSE_DATE = datetime(2023, 9, 30, tzinfo=TZ_INFO)
-EVENT_START_DATE = datetime(2023, 10, 10, 10, 0, 0, tzinfo=TZ_INFO)
-EVENT_END_DATE = datetime(2023, 10, 11, 17, 0, 0, tzinfo=TZ_INFO)
-HARDWARE_SIGN_OUT_START_DATE = datetime(2020, 9, 1, tzinfo=TZ_INFO)
-HARDWARE_SIGN_OUT_END_DATE = datetime(2024, 9, 30, tzinfo=TZ_INFO)
+REGISTRATION_OPEN_DATE = datetime(2024, 1, 9, tzinfo=TZ_INFO)
+REGISTRATION_CLOSE_DATE = datetime(2024, 2, 4, tzinfo=TZ_INFO)
+EVENT_START_DATE = datetime(2024, 2, 17, 8, 0, 0, tzinfo=TZ_INFO)
+EVENT_END_DATE = datetime(2024, 2, 18, 17, 0, 0, tzinfo=TZ_INFO)
+HARDWARE_SIGN_OUT_START_DATE = datetime(2024, 2, 18, 6, 30, tzinfo=TZ_INFO)
+HARDWARE_SIGN_OUT_END_DATE = datetime(2024, 2, 18, 11, 0, tzinfo=TZ_INFO)
 
 # Registration user requirements
 MINIMUM_AGE = 18
@@ -333,7 +333,6 @@ ACCOUNT_ACTIVATION_DAYS = 7
 RSVP_DAYS = 7
 
 # Team requirements
-# TODO: Double check
 MIN_MEMBERS = 2
 MAX_MEMBERS = 4
 
@@ -346,15 +345,11 @@ WAITLISTED_ACCEPTANCE_START_TIME = EVENT_START_DATE + timedelta(hours=1)
 FINAL_REVIEW_RESPONSE_DATE = REGISTRATION_CLOSE_DATE + timedelta(days=7)
 
 # Links
-
-# TODO: CHANGE
-PARTICIPANT_PACKAGE_LINK = "#"
+PARTICIPANT_PACKAGE_LINK = "https://docs.google.com/document/d/1xJAJTbcQyDCvjJ69JtLThClbwiou8azEMH7QqEFCqLo/edit?usp=sharing"
 
 # Note this is in the form (chat_room_name, chat_room_link)
 # Chat room name is such as the following: Slack, Discord
-
-# TODO: CHANGE
-CHAT_ROOM = ("Slack", "https://slack.com")
+CHAT_ROOM = ("Discord", "https://discord.gg/dNRs3p2Ab9")
 
 # Enable/Disable certain Features
 TEAMS = True
@@ -362,3 +357,33 @@ RSVP = True
 
 # HSS Testing
 TEST_USER_GROUP = "HSS Test Users"
+
+# sign in times must be between EVENT_START_DATE and EVENT_END_DATE and in chronological order
+# the number of sign in times MUST MATCH the number of columns in UserActivityTable
+SIGN_IN_TIMES = [
+    {
+        "name": "sign_in",
+        "description": "Hackathon Sign In",
+        "time": datetime(2024, 2, 17, 9, 0, 0, tzinfo=TZ_INFO),  # Feb 17th @ 8:30am
+    },
+    {
+        "name": "lunch1",
+        "description": "Lunch Day 1",
+        "time": datetime(2024, 2, 17, 13, 0, 0, tzinfo=TZ_INFO),  # Feb 17th @ 1pm
+    },
+    {
+        "name": "dinner1",
+        "description": "Dinner Day 1",
+        "time": datetime(2024, 2, 17, 18, 0, 0, tzinfo=TZ_INFO),  # Feb 17th @ 6pm
+    },
+    {
+        "name": "breakfast2",
+        "description": "Breakfast Day 2",
+        "time": datetime(2024, 2, 18, 8, 0, 0, tzinfo=TZ_INFO),  # Feb 18th @ 8am
+    },
+    {
+        "name": "lunch2",
+        "description": "Lunch Day 2",
+        "time": datetime(2024, 2, 18, 12, 0, 0, tzinfo=TZ_INFO),  # Feb 18th @ 1pm
+    },
+]

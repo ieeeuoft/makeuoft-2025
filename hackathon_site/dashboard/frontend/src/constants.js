@@ -1,8 +1,9 @@
-export const hackathonName = "Hackathon Name";
+export const hackathonName = "MakeUofT 2024";
 export const adminGroup = "Hardware Site Admins";
 export const minTeamSize = 2;
 export const maxTeamSize = 4;
-export const hardwareSignOutStartDate = new Date(2020, 9, 1, 23, 59);
-export const hardwareSignOutEndDate = new Date(2025, 9, 30, 11, 59);
+export const hardwareSignOutStartDate = new Date(2024, 1, 18, 6, 30);
+export const hardwareSignOutEndDate = new Date(2024, 1, 18, 11, 0);
 export const hssTestUserGroup = "HSS Test Users";
+export const serverUrl = "https://makeuoft.ca";
 export const minProjectDescriptionLength = 60;

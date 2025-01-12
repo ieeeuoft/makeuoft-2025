@@ -26,44 +26,55 @@ export const cardItems = [
         title: "Important Links",
         content: [
             {
-                name: "Hackathon main site",
-                url: "https://www.facebook.com",
-                icon: <OpenInNew />,
-            },
-            {
-                name: "Hardware Signout Site",
-                url: "https://hardware.newhacks.ca",
+                name: "MakeUofT Main Site",
+                url: "https://makeuoft.ca/",
                 icon: <OpenInNew />,
             },
         ],
     },
     {
-        title: "General electronics aid",
+        title: "General Electronics aid",
         content: [
             {
-                name: "Test1 asdajslkd",
-                url: "https://www.youtube.com",
+                name: "Circuit Design App - Circuit.io",
+                url: "https://www.circuito.io/",
                 icon: <OpenInNew />,
             },
-            { name: "Test2", url: "https://www.youtube.com", icon: <OpenInNew /> },
             {
-                name: "Test3 asknd",
-                url: "https://www.youtube.com",
+                name: "Learn about batteries - Battery University",
+                url: "https://batteryuniversity.com/articles",
                 icon: <OpenInNew />,
             },
-            { name: "Test4 blah", url: "https://www.youtube.com", icon: <GetApp /> },
-            { name: "Test5", url: "https://www.youtube.com", icon: <GetApp /> },
+            {
+                name: "Learn Electronics - SparkFun",
+                url: "https://www.sparkfun.com/",
+                icon: <OpenInNew />,
+            },
+            {
+                name: "Electronics Tutorials - GreatScott",
+                url: "https://www.youtube.com/user/greatscottlab",
+                icon: <OpenInNew />,
+            },
+            {
+                name: "Learn Arduino Programming",
+                url: "https://www.halvorsen.blog/documents/technology/resources/resources/Arduino/Programming%20with%20Arduino.pdf",
+                icon: <GetApp />,
+            },
         ],
     },
     {
         title: "Stores nearby",
         content: [
             {
-                name: "Home Hardware",
-                url: "https://www.facebook.com",
+                name: "Canada Computers",
+                url: "https://www.canadacomputers.com/",
                 icon: <PinDrop />,
             },
-            { name: "Test2", url: "https://www.facebook.com", icon: <PinDrop /> },
+            {
+                name: "Home Hardware",
+                url: "https://www.homehardware.ca/en/store/16093",
+                icon: <PinDrop />,
+            },
         ],
     },
 ];
@@ -333,6 +344,7 @@ export const mockTeamMultiple = {
             },
         },
     ],
+    project_description: "",
 };
 
 // Valid Team Size
@@ -842,6 +854,7 @@ export const mockPendingOrdersInTable: OrderInTable[] = [
                 id: 10,
                 quantityRequested: 2,
                 quantityGranted: 1,
+                quantityGrantedBySystem: 1,
             },
         ],
         status: "Ready for Pickup",
@@ -855,11 +868,13 @@ export const mockPendingOrdersInTable: OrderInTable[] = [
                 id: 1,
                 quantityRequested: 2,
                 quantityGranted: 2,
+                quantityGrantedBySystem: 2,
             },
             {
                 id: 4,
                 quantityRequested: 1,
                 quantityGranted: 1,
+                quantityGrantedBySystem: 1,
             },
         ],
         status: "Submitted",
@@ -873,11 +888,13 @@ export const mockPendingOrdersInTable: OrderInTable[] = [
                 id: 3,
                 quantityRequested: 1,
                 quantityGranted: 1,
+                quantityGrantedBySystem: 1,
             },
             {
                 id: 4,
                 quantityRequested: 1,
                 quantityGranted: 1,
+                quantityGrantedBySystem: 1,
             },
         ],
         status: "Ready for Pickup",
@@ -894,6 +911,7 @@ export const mockCheckedOutOrdersInTable: OrderInTable[] = [
                 id: 10,
                 quantityRequested: 3,
                 quantityGranted: 2,
+                quantityGrantedBySystem: 2,
             },
         ],
         status: "Picked Up",
@@ -907,11 +925,13 @@ export const mockCheckedOutOrdersInTable: OrderInTable[] = [
                 id: 1,
                 quantityRequested: 2,
                 quantityGranted: 1,
+                quantityGrantedBySystem: 1,
             },
             {
                 id: 2,
                 quantityRequested: 1,
                 quantityGranted: 1,
+                quantityGrantedBySystem: 1,
             },
         ],
         status: "Picked Up",
@@ -925,6 +945,7 @@ export const mockCheckedOutOrdersInTable: OrderInTable[] = [
                 id: 1,
                 quantityRequested: 2,
                 quantityGranted: 2,
+                quantityGrantedBySystem: 2,
             },
         ],
         status: "Picked Up",
