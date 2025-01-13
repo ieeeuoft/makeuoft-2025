@@ -317,7 +317,7 @@ CONTACT_EMAIL = DEFAULT_FROM_EMAIL
 HSS_ADMIN_EMAIL = "hardware@makeuoft.ca"
 
 REGISTRATION_OPEN_DATE = datetime(
-    2025, 1, 11, tzinfo=TZ_INFO
+    2025, 1, 31, tzinfo=TZ_INFO
 )  # CHANGE FOR TESTING PURPOSES
 REGISTRATION_CLOSE_DATE = datetime(
     2025, 2, 4, tzinfo=TZ_INFO
