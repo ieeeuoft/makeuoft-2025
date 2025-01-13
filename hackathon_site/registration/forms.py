@@ -24,7 +24,7 @@ class SignUpForm(UserCreationForm):
     simpler than creating a custom user model to use email as username.
     """
 
-    captcha = ReCaptchaField(label="")
+    # captcha = ReCaptchaField(label="")
     error_css_class = "invalid"
 
     class Meta(UserCreationForm.Meta):
