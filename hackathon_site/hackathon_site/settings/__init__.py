@@ -316,7 +316,7 @@ DEFAULT_FROM_EMAIL = "hello@makeuoft.ca"
 CONTACT_EMAIL = DEFAULT_FROM_EMAIL
 HSS_ADMIN_EMAIL = "hardware@makeuoft.ca"
 
-REGISTRATION_OPEN_DATE = datetime(2025, 1, 28, tzinfo=TZ_INFO)
+REGISTRATION_OPEN_DATE = datetime(2025, 1, 1, tzinfo=TZ_INFO)
 REGISTRATION_CLOSE_DATE = datetime(2025, 2, 7, 23, 59, 0, tzinfo=TZ_INFO)
 EVENT_START_DATE = datetime(2025, 2, 15, 8, 0, 0, tzinfo=TZ_INFO)
 EVENT_END_DATE = datetime(2025, 2, 16, 17, 0, 0, tzinfo=TZ_INFO)
@@ -324,7 +324,7 @@ HARDWARE_SIGN_OUT_START_DATE = datetime(2025, 1, 17, 6, 30, tzinfo=TZ_INFO)
 HARDWARE_SIGN_OUT_END_DATE = datetime(2025, 2, 18, 11, 0, tzinfo=TZ_INFO)
 
 # Registration user requirements
-MINIMUM_AGE = 18
+MINIMUM_AGE = 17
 
 # Registration settings
 ACCOUNT_ACTIVATION_DAYS = 7
