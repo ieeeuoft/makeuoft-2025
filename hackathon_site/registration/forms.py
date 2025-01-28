@@ -64,6 +64,9 @@ class SignUpForm(UserCreationForm):
         for field in self._meta.fields:
             self.fields[field].required = True
 
+    def clean_email(self):
+        return self.cleaned_data["email"].lower()
+
     def clean_first_name(self):
         if not bool(re.search("^[a-zA-Z0-9\s-]*$", self.cleaned_data["first_name"])):
             raise forms.ValidationError(
