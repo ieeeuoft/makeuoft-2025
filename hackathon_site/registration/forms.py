@@ -198,7 +198,7 @@ class ApplicationForm(forms.ModelForm):
             "why_participate": forms.Textarea(
                 attrs={
                     "class": "materialize-textarea",
-                    "placeholder": "I want to participate in NewHacks because...",
+                    "placeholder": "I want to participate in MakeUofT because...",
                     "data-length": 1000,
                 }
             ),
