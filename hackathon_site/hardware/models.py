@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Count, F, Q
+from django.db.models import Count, F, Q, Sum
 
 from event.models import Team as TeamEvent
 
@@ -127,10 +127,12 @@ class Order(models.Model):
 
     # TODO sum only specific order statuses (self.items.part_returned_health = None)
     def get_total_credits(self):
+        """
+        Sums up credits only for OrderItems where part_returned_health is None.
+        """
         return (
-            self.items.aggregate(total_credits=models.Sum(F("hardware__credits")))[
-                "total_credits"
-            ]
+            self.items.filter(part_returned_health__isnull=True)
+            .aggregate(total_credits=Sum(F("hardware__credits")))["total_credits"]
             or 0
         )
 
