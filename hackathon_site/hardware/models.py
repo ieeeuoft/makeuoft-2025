@@ -125,8 +125,17 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
 
+    # TODO sum only specific order statuses (self.items.part_returned_health = None)
+    def get_total_credits(self):
+        return (
+            self.items.aggregate(total_credits=models.Sum(F("hardware__credits")))[
+                "total_credits"
+            ]
+            or 0
+        )
+
     def __str__(self):
-        return f"{self.id}"
+        return f"{self.id} | Total Credits: {self.get_total_credits()}"
 
 
 class Incident(models.Model):

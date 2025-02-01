@@ -2,7 +2,7 @@ from collections import Counter
 import functools
 from datetime import datetime
 
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F, Sum
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.conf import settings
 from rest_framework import serializers
@@ -141,6 +141,7 @@ class OrderItemListSerializer(serializers.ModelSerializer):
 class OrderListSerializer(serializers.ModelSerializer):
     items = OrderItemInOrderSerializer(many=True, read_only=True)
     team_code = serializers.SerializerMethodField()
+    total_credits = serializers.SerializerMethodField()  # Add total_credits field
 
     class Meta:
         model = Order
@@ -153,11 +154,21 @@ class OrderListSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "request",
+            "total_credits",  # Include total_credits in API response
         )
 
     @staticmethod
     def get_team_code(obj: Order):
         return obj.team.team_code if obj.team else None
+
+    def get_total_credits(self, obj):
+        """
+        Fetches total credits dynamically by summing up credits from related OrderItems.
+        """
+        total_credits = obj.items.aggregate(total_credits=Sum(F("hardware__credits")))[
+            "total_credits"
+        ]
+        return total_credits or 0  # Return 0 if no credits are found
 
 
 class OrderChangeSerializer(OrderListSerializer):
