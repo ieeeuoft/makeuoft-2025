@@ -35,6 +35,7 @@ import {
     returnedOrdersSelector,
     cancelOrderThunk,
     cancelOrderLoadingSelector,
+    getTeamOrders
 } from "slices/order/orderSlice";
 import {
     GeneralOrderTitle,
@@ -255,6 +256,7 @@ export const PendingTables = () => {
     const submitCancelOrderModal = (cancelOrderId: number | null) => {
         if (cancelOrderId != null) {
             cancelOrder(cancelOrderId); // Perform Cancellation
+            getTeamOrders();
             setShowCancelOrderModal(false);
         }
     };
