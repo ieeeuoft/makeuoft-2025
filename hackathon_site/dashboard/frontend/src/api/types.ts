@@ -127,6 +127,7 @@ export interface Order {
         id: number;
         requested_quantity: number;
     }[];
+    total_credits: number;
     created_at: string;
     updated_at: string;
 }

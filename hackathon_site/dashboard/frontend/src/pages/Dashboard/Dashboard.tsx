@@ -12,7 +12,7 @@ import {
 import ProductOverview from "components/inventory/ProductOverview/ProductOverview";
 import Header from "components/general/Header/Header";
 import { cardItems } from "testing/mockData";
-import { hackathonName } from "constants.js";
+import { hackathonName, creditsAvailable } from "constants.js";
 import { useDispatch, useSelector } from "react-redux";
 import {
     getCurrentTeam,
@@ -26,6 +26,7 @@ import {
     getTeamOrders,
     hardwareInOrdersSelector,
     orderErrorSelector,
+    getCreditsUsedSelector,
     isLoadingSelector as areOrdersLoadingSelector,
 } from "slices/order/orderSlice";
 import { getHardwareWithFilters, setFilters } from "slices/hardware/hardwareSlice";
@@ -45,6 +46,7 @@ const Dashboard = () => {
     const hardwareInOrders = useSelector(hardwareInOrdersSelector);
     const team_code = useSelector(teamCodeSelector);
     const team_size = useSelector(teamSizeSelector);
+    const creditsUsed = useSelector(getCreditsUsedSelector);
 
     useEffect(() => {
         dispatch(getCurrentTeam());
@@ -71,7 +73,10 @@ const Dashboard = () => {
                 teamSize={team_size}
             />
             <div className={styles.dashboard}>
-                <Typography variant="h1">{hackathonName} Hardware Dashboard</Typography>
+                {/* TODO: MOVE CREDIT TO NAVBAR */}
+                <Typography variant="h1">
+                    {hackathonName} Hardware Dashboard {creditsAvailable - creditsUsed}
+                </Typography>
                 <DateRestrictionAlert />
                 {isTeamLoading || areOrdersLoading ? (
                     <LinearProgress

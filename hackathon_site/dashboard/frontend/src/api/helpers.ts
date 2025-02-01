@@ -25,13 +25,18 @@ export const teamOrderListSerialization = (
     checkedOutOrders: OrderInTable[];
     returnedOrders: ReturnOrderInTable[];
     hardwareIdsToFetch: number[];
+    creditsUsed: number;
 } => {
     const pendingOrders: OrderInTable[] = [];
     const checkedOutOrders: OrderInTable[] = [];
     const returnedOrders: ReturnOrderInTable[] = [];
     const hardwareIdsToFetch: Record<number, number> = {};
+    let creditsUsed = 0; // Initialize credits used
+
     orders.forEach((order) => {
         if (order.status !== "Cancelled") {
+            creditsUsed += order.total_credits || 0; // Sum up total credits
+
             const hardwareItems: Record<number, OrderItemTableRow> = {};
             const hardwareRequested: Record<number, number> = {};
             const returnedItems: Record<string, ReturnedItem> = {};
@@ -103,6 +108,7 @@ export const teamOrderListSerialization = (
         checkedOutOrders: [...checkedOutOrders].sort((a, b) => b.id - a.id),
         returnedOrders,
         hardwareIdsToFetch: Object.values(hardwareIdsToFetch),
+        creditsUsed,
     };
 };
 

@@ -7,3 +7,4 @@ export const hardwareSignOutEndDate = new Date(2025, 1, 18, 11, 0);
 export const hssTestUserGroup = "HSS Test Users";
 export const serverUrl = "https://makeuoft.ca";
 export const minProjectDescriptionLength = 60;
+export const creditsAvailable = 300;

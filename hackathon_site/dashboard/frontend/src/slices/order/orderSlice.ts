@@ -18,7 +18,7 @@ interface OrderExtraState {
     hardwareInOrders: number[] | null;
     returnedOrders: ReturnOrderInTable[];
     checkedOutOrders: OrderInTable[];
-    credit: number;
+    creditsUsed: number;
 }
 
 const extraState: OrderExtraState = {
@@ -29,7 +29,7 @@ const extraState: OrderExtraState = {
     hardwareInOrders: null,
     returnedOrders: [],
     checkedOutOrders: [],
-    credit: 100,
+    creditsUsed: 0,
 };
 
 const pendingOrderAdapter = createEntityAdapter<OrderInTable>();
@@ -116,6 +116,7 @@ const orderSlice = createSlice({
                 checkedOutOrders,
                 returnedOrders,
                 hardwareIdsToFetch,
+                creditsUsed,
                 // TODO: add credit
             } = teamOrderListSerialization(payload.results);
 
@@ -123,6 +124,7 @@ const orderSlice = createSlice({
             state.checkedOutOrders = checkedOutOrders;
             state.returnedOrders = returnedOrders;
             state.hardwareInOrders = hardwareIdsToFetch;
+            state.creditsUsed = creditsUsed;
         });
 
         builder.addCase(getTeamOrders.rejected, (state, { payload }) => {
@@ -188,7 +190,7 @@ export const cancelOrderLoadingSelector = createSelector(
     (orderSlice) => orderSlice.cancelOrderLoading
 );
 
-export const getCreditSelector = createSelector(
+export const getCreditsUsedSelector = createSelector(
     [orderSliceSelector],
-    (orderSlice) => orderSlice.credit
+    (orderSlice) => orderSlice.creditsUsed
 );

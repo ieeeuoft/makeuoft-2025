@@ -23,7 +23,7 @@ const AdminDashboard = () => {
         status: ["Submitted", "Ready for Pickup"],
     };
     dispatch(setFilters(pendingFilter));
-    dispatch(getOrdersWithFilters());
+    // TODO: getting spammed by this call investigate --> dispatch(getOrdersWithFilters());
     const numOrdersOnPage = 6;
     const ordersLength =
         allOrders.length <= numOrdersOnPage ? allOrders.length : numOrdersOnPage;

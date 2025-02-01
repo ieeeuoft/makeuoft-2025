@@ -643,6 +643,7 @@ export const mockPendingOrders: Order[] = [
                 requested_quantity: 1,
             },
         ],
+        total_credits: 5,
     },
     {
         id: 4,
@@ -678,6 +679,7 @@ export const mockPendingOrders: Order[] = [
                 requested_quantity: 1,
             },
         ],
+        total_credits: 5,
     },
     {
         id: 5,
@@ -699,6 +701,7 @@ export const mockPendingOrders: Order[] = [
                 requested_quantity: 2,
             },
         ],
+        total_credits: 5,
     },
     {
         id: 6,
@@ -720,6 +723,7 @@ export const mockPendingOrders: Order[] = [
                 requested_quantity: 2,
             },
         ],
+        total_credits: 5,
     },
 ];
 
@@ -749,6 +753,7 @@ export const mockCheckedOutOrders: Order[] = [
                 requested_quantity: 2,
             },
         ],
+        total_credits: 5,
     },
     {
         id: 2,
@@ -784,6 +789,7 @@ export const mockCheckedOutOrders: Order[] = [
                 requested_quantity: 1,
             },
         ],
+        total_credits: 5,
     },
     {
         id: 7,
@@ -815,6 +821,7 @@ export const mockCheckedOutOrders: Order[] = [
                 requested_quantity: 3,
             },
         ],
+        total_credits: 5,
     },
 ];
 
@@ -854,6 +861,7 @@ export const mockSubmittedOrder: Order = {
             requested_quantity: 1,
         },
     ],
+    total_credits: 5,
 };
 
 export const mockPendingOrdersInTable: OrderInTable[] = [
