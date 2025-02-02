@@ -21,6 +21,7 @@ import { cartSelectors, cartTotalSelector } from "slices/hardware/cartSlice";
 import { getCategories } from "slices/hardware/categorySlice";
 import CartErrorBox from "components/cart/CartErrorBox/CartErrorBox";
 import { getCurrentTeam } from "slices/event/teamSlice";
+import { getTeamOrders } from "slices/order/orderSlice";
 
 const Cart = () => {
     const cartItems = useSelector(cartSelectors.selectAll);
@@ -37,6 +38,7 @@ const Cart = () => {
 
     useEffect(() => {
         dispatch(getCurrentTeam());
+        dispatch(getTeamOrders());
     }, [dispatch]);
 
     useEffect(() => {

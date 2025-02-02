@@ -5,6 +5,7 @@ import { connect, useSelector } from "react-redux";
 // Images and logos
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import LocalMallIcon from "@material-ui/icons/LocalMall";
+import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
 import ListAlt from "@material-ui/icons/ListAlt";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import InsertChartOutlined from "@material-ui/icons/InsertChartOutlined";
@@ -15,6 +16,8 @@ import Button from "@material-ui/core/Button";
 import { logout, userTypeSelector } from "slices/users/userSlice";
 import { RootState } from "slices/store";
 import { cartTotalSelector } from "slices/hardware/cartSlice";
+import { getCreditsUsedSelector } from "slices/order/orderSlice";
+import { creditsAvailable } from "constants.js";
 
 interface NavBarProps {
     logout: any;
@@ -24,6 +27,7 @@ interface NavBarProps {
 export const UnconnectedNavbar = ({ logout, pathname }: NavBarProps) => {
     const cartQuantity = useSelector(cartTotalSelector);
     const userType = useSelector(userTypeSelector);
+    const creditsUsed = useSelector(getCreditsUsedSelector);
 
     const isParticipant = userType === "participant";
     const isAdmin = userType === "admin";
@@ -32,6 +36,15 @@ export const UnconnectedNavbar = ({ logout, pathname }: NavBarProps) => {
     return (
         <nav className={styles.nav}>
             <div className={styles.navFlexDiv}>
+                {isParticipant && (
+                    <Button
+                        className={styles.navBtn}
+                        aria-label="Credits"
+                        startIcon={<AccountBalanceWalletIcon />}
+                    >
+                        Credits {creditsAvailable - creditsUsed}
+                    </Button>
+                )}
                 {isParticipantOrAdmin && (
                     <Link to={"/"}>
                         <Button

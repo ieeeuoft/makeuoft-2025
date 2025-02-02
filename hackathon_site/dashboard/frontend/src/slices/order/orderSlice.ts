@@ -142,6 +142,8 @@ const orderSlice = createSlice({
             state.cancelOrderLoading = false;
             if (payload) {
                 pendingOrderAdapter.removeOne(state, payload.id);
+                // want to add to payload.total_credits
+                state.creditsUsed -= payload.total_credits;
             }
         });
 
