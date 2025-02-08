@@ -166,6 +166,7 @@ export const updateOrderStatus = createAsyncThunk<
                     },
                 })
             );
+            dispatch(getAdminTeamOrders(response.data.team_code));
             return response.data;
         } catch (e: any) {
             const message =
@@ -233,7 +234,8 @@ const teamOrderSlice = createSlice({
         builder.addCase(updateOrderStatus.fulfilled, (state, { payload }) => {
             state.isLoading = false;
             state.error = null;
-            const { pendingOrders } = teamOrderListSerialization([payload]);
+            const { pendingOrders, checkedOutOrders, returnedOrders } =
+                teamOrderListSerialization([payload]);
             let updateObject;
             if (pendingOrders.length > 0) {
                 const { hardwareInTableRow } = pendingOrders[0];
