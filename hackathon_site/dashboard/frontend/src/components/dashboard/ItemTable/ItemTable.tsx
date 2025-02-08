@@ -35,7 +35,6 @@ import {
     returnedOrdersSelector,
     cancelOrderThunk,
     cancelOrderLoadingSelector,
-    getTeamOrders,
 } from "slices/order/orderSlice";
 import {
     GeneralOrderTitle,
@@ -44,7 +43,6 @@ import {
     GeneralReturnTable,
 } from "components/general/OrderTables/OrderTables";
 import PopupModal from "components/general/PopupModal/PopupModal";
-import { Link } from "react-router-dom";
 import { sortPendingOrders, sortReturnedOrders } from "api/helpers";
 import { sortCheckedOutOrders } from "api/helpers";
 
