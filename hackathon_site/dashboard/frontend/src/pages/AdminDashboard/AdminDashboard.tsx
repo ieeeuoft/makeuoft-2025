@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import Typography from "@material-ui/core/Typography";
 import Header from "components/general/Header/Header";
 import { hackathonName } from "constants.js";
@@ -19,13 +19,16 @@ const AdminDashboard = () => {
     const dispatch = useDispatch();
     const history = useHistory();
     const allOrders = useSelector(adminOrderSelectors.selectAll);
-    const pendingFilter: OrderFilters = {
-        status: ["Submitted", "Ready for Pickup"],
-    };
+    const pendingFilter: OrderFilters = useMemo(
+        () => ({
+            status: ["Submitted", "Ready for Pickup"],
+        }),
+        []
+    );
     useEffect(() => {
         dispatch(setFilters(pendingFilter));
         dispatch(getOrdersWithFilters());
-    }, [dispatch]);
+    }, [dispatch, pendingFilter]);
     const numOrdersOnPage = 6;
     const ordersLength =
         allOrders.length <= numOrdersOnPage ? allOrders.length : numOrdersOnPage;
