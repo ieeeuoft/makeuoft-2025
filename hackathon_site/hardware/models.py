@@ -128,12 +128,16 @@ class Order(models.Model):
     # TODO sum only specific order statuses (self.items.part_returned_health = None)
     def get_total_credits(self):
         """
-        Sums up credits only for OrderItems where part_returned_health is None.
+        Computes the total credits used by a team:
+        - Includes items that are still checked out (part_returned_health is NULL).
+        - Includes returned items that are marked as "Broken" or "Lost".
+        - Excludes items that were returned in acceptable conditions.
         """
         return (
-            self.items.filter(part_returned_health__isnull=True).aggregate(
-                total_credits=Sum(F("hardware__credits"))
-            )["total_credits"]
+            self.items.filter(
+                Q(part_returned_health__isnull=True)
+                | Q(part_returned_health__in=["Broken", "Lost"])
+            ).aggregate(total_credits=Sum(F("hardware__credits")))["total_credits"]
             or 0
         )
 
