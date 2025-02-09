@@ -320,7 +320,7 @@ REGISTRATION_OPEN_DATE = datetime(2025, 1, 28, tzinfo=TZ_INFO)
 REGISTRATION_CLOSE_DATE = datetime(2025, 2, 11, 23, 59, 0, tzinfo=TZ_INFO)
 EVENT_START_DATE = datetime(2025, 2, 15, 8, 0, 0, tzinfo=TZ_INFO)
 EVENT_END_DATE = datetime(2025, 2, 16, 17, 0, 0, tzinfo=TZ_INFO)
-HARDWARE_SIGN_OUT_START_DATE = datetime(2025, 1, 11, 11, 00, tzinfo=TZ_INFO)
+HARDWARE_SIGN_OUT_START_DATE = datetime(2025, 2, 11, 23, 59, tzinfo=TZ_INFO)
 HARDWARE_SIGN_OUT_END_DATE = datetime(2025, 2, 16, 11, 0, tzinfo=TZ_INFO)
 
 # Registration user requirements
@@ -328,7 +328,7 @@ MINIMUM_AGE = 17
 
 # Registration settings
 ACCOUNT_ACTIVATION_DAYS = 7
-RSVP_DAYS = 7
+RSVP_DAYS = 2  # TODO: Confirm with logistics
 
 # Team requirements
 MIN_MEMBERS = 2
