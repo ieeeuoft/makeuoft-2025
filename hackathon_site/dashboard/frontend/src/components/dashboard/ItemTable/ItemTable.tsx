@@ -182,27 +182,19 @@ export const CheckedOutTables = () =>
                                                         <TableCell align="right">
                                                             {row.quantityGranted}
                                                         </TableCell>
-                                                        {/* <TableCell align="right">
-                                                            <Link
-                                                                to={`/incident-form?data=${JSON.stringify(
-                                                                    row
-                                                                )}`}
-                                                            >
-                                                                TODO: this has not been implemented yet
-                                                                <Button
-                                                                    color="secondary"
-                                                                    size="small"
-                                                                    onClick={() => {
-                                                                        console.log(
-                                                                            "reporting incident",
-                                                                            row.id
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    Report broken/lost
-                                                                </Button>
-                                                            </Link>
-                                                        </TableCell> */}
+                                                        <TableCell align="right">
+                                                            {/* TODO: Add back in when incident reports are being used*/}
+                                                            {/*<Button*/}
+                                                            {/*    color="secondary"*/}
+                                                            {/*    size="small"*/}
+                                                            {/*    onClick={() => {*/}
+                                                            {/*        reportIncident(row.id);*/}
+                                                            {/*        push("/incident-form");*/}
+                                                            {/*    }}*/}
+                                                            {/*>*/}
+                                                            {/*    Report broken/lost*/}
+                                                            {/*</Button>*/}
+                                                        </TableCell>
                                                     </TableRow>
                                                 )
                                             )}

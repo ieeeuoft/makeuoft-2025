@@ -63,7 +63,7 @@ const Inventory = () => {
     return (
         <>
             <Header />
-            <ProductOverview showAddToCartButton />
+            <ProductOverview showAddToCartButton={userType === "participant"} />
             <div className={styles.inventory}>
                 <Drawer
                     className={styles.inventoryFilterDrawer}

@@ -166,6 +166,7 @@ export const updateOrderStatus = createAsyncThunk<
                     },
                 })
             );
+            dispatch(getAdminTeamOrders(response.data.team_code));
             return response.data;
         } catch (e: any) {
             const message =

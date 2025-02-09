@@ -117,7 +117,6 @@ const orderSlice = createSlice({
                 returnedOrders,
                 hardwareIdsToFetch,
                 creditsUsed,
-                // TODO: add credit
             } = teamOrderListSerialization(payload.results);
 
             pendingOrderAdapter.setAll(state, pendingOrders);

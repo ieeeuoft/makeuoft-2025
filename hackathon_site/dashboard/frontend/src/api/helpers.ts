@@ -90,7 +90,13 @@ export const teamOrderListSerialization = (
                     hardwareInOrder: returnedHardware,
                 });
             const hardwareInTableRow = Object.values(hardwareItems);
-            if (hardwareInTableRow.length > 0)
+
+            // Check if ALL order items have a part_returned_health status (i.e., they are all returned or rejected)
+            const allItemsReturnedOrRejected = order.items.every(
+                (item) => item.part_returned_health !== null
+            );
+
+            if (hardwareInTableRow.length > 0 && !allItemsReturnedOrRejected) {
                 (order.status === "Submitted" || order.status === "Ready for Pickup"
                     ? pendingOrders
                     : checkedOutOrders
@@ -101,6 +107,7 @@ export const teamOrderListSerialization = (
                     createdTime: order.created_at,
                     updatedTime: order.updated_at,
                 });
+            }
         }
     });
     return {

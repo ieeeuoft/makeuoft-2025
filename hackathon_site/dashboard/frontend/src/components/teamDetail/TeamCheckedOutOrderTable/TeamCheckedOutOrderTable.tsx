@@ -32,7 +32,6 @@ import {
     isReturnedLoadingSelector,
     returnItems,
     updateOrderStatus,
-    UpdateOrderAttributes,
 } from "slices/order/teamOrderSlice";
 import {
     getUpdatedHardwareDetails,
@@ -83,11 +82,20 @@ export const TeamCheckedOutOrderTable = () => {
         dispatch(getUpdatedHardwareDetails(hardwareId));
         dispatch(openProductOverview());
     };
-
     const handleReturnOrder = (values: FormikValues, orderId: number) => {
         try {
-            // convert formik to correct format here
-            const hardware = [];
+            // Find the order by ID
+            const checkedOutOrder = orders.find((order) => order.id === orderId);
+            if (!checkedOutOrder) {
+                throw new Error("Order not found.");
+            }
+
+            // Convert formik values to correct format
+            const hardware: {
+                id: number;
+                quantity: number;
+                part_returned_health: string;
+            }[] = [];
             const keys = Object.keys(values);
             for (let i = 0; i < keys.length; i += 3) {
                 const id = parseInt(keys[i].split("-")[0]);
@@ -99,22 +107,25 @@ export const TeamCheckedOutOrderTable = () => {
                     });
                 }
             }
+
             dispatch(returnItems({ hardware, order: orderId }));
-            // If all order items have been returned, update order status to 'Returned'
-            if (hardware.length === keys.length / 3) {
-                const updateOrderData: UpdateOrderAttributes = {
-                    id: orderId,
-                    status: "Returned",
-                };
-                dispatch(updateOrderStatus(updateOrderData));
+
+            // Check if all items in the order have been returned
+            const allItemsReturned = checkedOutOrder.hardwareInTableRow.every((row) => {
+                const returnedQuantity =
+                    hardware.find((h) => h.id === row.id)?.quantity || 0;
+                const remainingQty = (row.quantityGranted || 0) - returnedQuantity;
+                return remainingQty === 0;
+            });
+
+            if (allItemsReturned) {
+                dispatch(updateOrderStatus({ id: orderId, status: "Returned" }));
             }
         } catch (e) {
             dispatch(
                 displaySnackbar({
-                    message: "There was an error parsing orders.",
-                    options: {
-                        variant: "error",
-                    },
+                    message: "There was an error processing the return.",
+                    options: { variant: "error" },
                 })
             );
         }
