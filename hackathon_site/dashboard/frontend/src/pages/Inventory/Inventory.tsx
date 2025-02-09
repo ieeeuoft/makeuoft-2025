@@ -9,6 +9,7 @@ import Button from "@material-ui/core/Button";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import CloseIcon from "@material-ui/icons/Close";
 import FilterListIcon from "@material-ui/icons/FilterList";
+import AlertBox from "components/general/AlertBox/AlertBox";
 import InventorySearch from "components/inventory/InventorySearch/InventorySearch";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
@@ -31,6 +32,7 @@ import { getCategories } from "slices/hardware/categorySlice";
 import { Grid } from "@material-ui/core";
 import { userTypeSelector } from "slices/users/userSlice";
 import DateRestrictionAlert from "components/general/DateRestrictionAlert/DateRestrictionAlert";
+import { hardwareSignOutEndDate, hardwareSignOutStartDate } from "../../constants";
 
 const Inventory = () => {
     const dispatch = useDispatch();
@@ -84,6 +86,13 @@ const Inventory = () => {
                 </Drawer>
 
                 <Typography variant="h1">Hardware Inventory</Typography>
+                <AlertBox
+                    title={"Disclaimer"}
+                    error={
+                        "Note: Hardware picture and links may not be accurate to distributed parts. Substitutions may be made on the day of the event."
+                    }
+                    type={"info"}
+                />
 
                 {userType === "participant" && <DateRestrictionAlert />}
 
