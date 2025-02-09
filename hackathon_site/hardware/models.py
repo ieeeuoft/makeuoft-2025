@@ -9,7 +9,7 @@ class Category(models.Model):
         verbose_name_plural = "categories"
 
     name = models.CharField(max_length=255, null=False)
-    max_per_team = models.IntegerField(null=True)
+    max_per_team = models.IntegerField(null=True, default=999)
 
     created_at = models.DateTimeField(auto_now_add=True, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
@@ -59,7 +59,7 @@ class Hardware(models.Model):
     credits = models.IntegerField(null=False, default=0)
     quantity_available = models.IntegerField(null=False)
     notes = models.TextField(null=True, blank=True)
-    max_per_team = models.IntegerField(null=True)
+    max_per_team = models.IntegerField(null=True, default=999)
     picture = models.ImageField(
         upload_to="uploads/hardware/pictures/", null=True, blank=True
     )

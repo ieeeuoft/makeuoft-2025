@@ -223,20 +223,20 @@ export const DetailInfoSection = ({
 }: DetailInfoSectionProps) => {
     return (
         <>
-            {constraints?.length > 0 && (
-                <>
-                    <Typography
-                        variant="body2"
-                        color="secondary"
-                        className={styles.heading}
-                    >
-                        Constraints
-                    </Typography>
-                    {constraints.map((constraint, i) => (
-                        <Typography key={i}>- {constraint}</Typography>
-                    ))}
-                </>
-            )}
+            {/*{constraints?.length > 0 && (*/}
+            {/*    <>*/}
+            {/*        <Typography*/}
+            {/*            variant="body2"*/}
+            {/*            color="secondary"*/}
+            {/*            className={styles.heading}*/}
+            {/*        >*/}
+            {/*            Constraints*/}
+            {/*        </Typography>*/}
+            {/*        {constraints.map((constraint, i) => (*/}
+            {/*            <Typography key={i}>- {constraint}</Typography>*/}
+            {/*        ))}*/}
+            {/*    </>*/}
+            {/*)}*/}
             <Typography variant="body2" className={styles.heading}>
                 Manufacturer
             </Typography>
