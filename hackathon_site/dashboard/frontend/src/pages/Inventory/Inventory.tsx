@@ -32,7 +32,6 @@ import { getCategories } from "slices/hardware/categorySlice";
 import { Grid } from "@material-ui/core";
 import { userTypeSelector } from "slices/users/userSlice";
 import DateRestrictionAlert from "components/general/DateRestrictionAlert/DateRestrictionAlert";
-// import { hardwareSignOutEndDate, hardwareSignOutStartDate } from "../../constants";
 
 const Inventory = () => {
     const dispatch = useDispatch();
