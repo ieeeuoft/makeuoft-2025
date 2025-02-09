@@ -328,7 +328,7 @@ MINIMUM_AGE = 17
 
 # Registration settings
 ACCOUNT_ACTIVATION_DAYS = 7
-RSVP_DAYS = 2  # TODO: Confirm with logistics
+RSVP_DAYS = 1
 
 # Team requirements
 MIN_MEMBERS = 2
@@ -363,26 +363,28 @@ SIGN_IN_TIMES = [
     {
         "name": "sign_in",
         "description": "Hackathon Sign In",
-        "time": datetime(2024, 2, 17, 9, 0, 0, tzinfo=TZ_INFO),  # Feb 17th @ 8:30am
+        "time": datetime(2024, 2, 15, 9, 0, 0, tzinfo=TZ_INFO),  # Feb 15th @ 9:00am
     },
     {
         "name": "lunch1",
         "description": "Lunch Day 1",
-        "time": datetime(2024, 2, 17, 13, 0, 0, tzinfo=TZ_INFO),  # Feb 17th @ 1pm
+        "time": datetime(
+            2024, 2, 15, 12, 0, 0, tzinfo=TZ_INFO
+        ),  # Feb 15th @ 12pm (noon)
     },
     {
         "name": "dinner1",
         "description": "Dinner Day 1",
-        "time": datetime(2024, 2, 17, 18, 0, 0, tzinfo=TZ_INFO),  # Feb 17th @ 6pm
+        "time": datetime(2024, 2, 15, 18, 0, 0, tzinfo=TZ_INFO),  # Feb 15th @ 6pm
     },
     {
         "name": "breakfast2",
         "description": "Breakfast Day 2",
-        "time": datetime(2024, 2, 18, 8, 0, 0, tzinfo=TZ_INFO),  # Feb 18th @ 8am
+        "time": datetime(2024, 2, 16, 8, 0, 0, tzinfo=TZ_INFO),  # Feb 16th @ 8am
     },
     {
         "name": "lunch2",
         "description": "Lunch Day 2",
-        "time": datetime(2024, 2, 18, 12, 0, 0, tzinfo=TZ_INFO),  # Feb 18th @ 1pm
+        "time": datetime(2024, 2, 16, 12, 0, 0, tzinfo=TZ_INFO),  # Feb 16th @ 1pm
     },
 ]
