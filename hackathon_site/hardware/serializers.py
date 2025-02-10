@@ -281,6 +281,13 @@ class OrderCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "User's team does not meet team size criteria"
             )
+
+        # Ensure user has a team
+        if not user_profile.team:
+            raise serializers.ValidationError("User does not belong to any team")
+
+        team = user_profile.team
+
         # requested_hardware is a Counter where the keys are <Hardware Object>'s
         # and values are <Int>'s
         requested_hardware = self.merge_requests(hardware_requests=data["hardware"])
@@ -304,6 +311,30 @@ class OrderCreateSerializer(serializers.Serializer):
         )
         category_counts = dict()
         error_messages = []
+
+        # Compute total credits already used by summing up all orders' credits
+        total_credits_used = sum(
+            order.get_total_credits()
+            for order in Order.objects.filter(team=team).exclude(status="Cancelled")
+        )
+
+        # Compute credits required for this new order
+        new_order_credits = sum(
+            hardware.credits * requested_quantity
+            for hardware, requested_quantity in requested_hardware.items()
+        )
+
+        # Compute remaining credits
+        remaining_credits = team.credits - total_credits_used
+        # Check if new order exceeds available credits
+        if new_order_credits > remaining_credits:
+            error_messages.append(
+                f"Order exceeds available team credits. "
+                f"Current available credits: {remaining_credits}. "
+                f"Requested credits: {new_order_credits}. "
+                f"Projected credits after order: {remaining_credits - new_order_credits}."
+            )
+
         for (hardware, requested_quantity) in requested_hardware.items():
             team_hardware = team_unreturned_orders.get(id=hardware.id)
             team_hardware_count = getattr(team_hardware, "past_order_count", 0)

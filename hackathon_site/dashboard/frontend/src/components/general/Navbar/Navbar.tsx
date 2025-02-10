@@ -44,7 +44,7 @@ export const UnconnectedNavbar = ({ logout, pathname }: NavBarProps) => {
                         aria-label="Credits"
                         startIcon={<AccountBalanceWalletIcon />}
                     >
-                        Credits {creditsRemaining}
+                        Credits {Math.max(creditsRemaining, 0)}
                     </Button>
                 )}
                 {isParticipantOrAdmin && (

@@ -32,6 +32,8 @@ import { getCategories } from "slices/hardware/categorySlice";
 import { Grid } from "@material-ui/core";
 import { userTypeSelector } from "slices/users/userSlice";
 import DateRestrictionAlert from "components/general/DateRestrictionAlert/DateRestrictionAlert";
+import { getCurrentTeam } from "slices/event/teamSlice";
+import { getTeamOrders } from "slices/order/orderSlice";
 
 const Inventory = () => {
     const dispatch = useDispatch();
@@ -59,7 +61,12 @@ const Inventory = () => {
         dispatch(clearFilters());
         dispatch(getHardwareWithFilters());
         dispatch(getCategories());
-    }, [dispatch]);
+        // Reload team-related data for participants on page reload for accurate credit usage
+        if (userType === "participant") {
+            dispatch(getCurrentTeam());
+            dispatch(getTeamOrders());
+        }
+    }, [dispatch, userType]);
 
     return (
         <>
