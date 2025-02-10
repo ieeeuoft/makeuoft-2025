@@ -48,7 +48,7 @@ ORDER_STATUS_MSG = {
 }
 
 ORDER_STATUS_CLOSING_MSG = {
-    "Ready for Pickup": "After the opening ceremony concludes on February 17th at around 11 am, please make your way to the Hardware Distribution Room at MYHAL 320 to retrieve your order.",
+    "Ready for Pickup": "After the opening ceremony concludes on February 15th at around 11 am, please make your way to the Hardware Distribution Room at MYHAL 320 to retrieve your order.",
     "Picked Up": "Take good care of your hardware and Happy Hacking! Remember to return the items when you are finished using them.",
     "Cancelled": f"A {settings.HACKATHON_NAME} exec will be in contact with you shortly. If you don't hear back from them soon, please go to the Hardware Distribution Room for more information on why your order was cancelled.",
     "Returned": f"Thank you for returning all hardware items!",
@@ -155,7 +155,7 @@ class CategoryListView(mixins.ListModelMixin, generics.GenericAPIView):
 
 
 class OrderListView(generics.ListAPIView):
-    queryset = Order.objects.all().select_related("team").prefetch_related("items",)
+    queryset = Order.objects.all().select_related("team").prefetch_related("items")
     serializer_method_classes = {
         "GET": OrderListSerializer,
         "POST": OrderCreateSerializer,
@@ -296,12 +296,10 @@ class OrderDetailView(generics.GenericAPIView, mixins.UpdateModelMixin):
                         render_to_string_context,
                     ),
                     message=render_to_string(
-                        self.update_order_email_template_admin,
-                        render_to_string_context,
+                        self.update_order_email_template_admin, render_to_string_context
                     ),
                     html_message=render_to_string(
-                        self.update_order_email_template_admin,
-                        render_to_string_context,
+                        self.update_order_email_template_admin, render_to_string_context
                     ),
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     connection=connection,
@@ -340,7 +338,7 @@ class OrderDetailView(generics.GenericAPIView, mixins.UpdateModelMixin):
 
 
 class OrderItemReturnView(generics.GenericAPIView):
-    queryset = Order.objects.all().prefetch_related("items",)
+    queryset = Order.objects.all().prefetch_related("items")
     serializer_class = OrderItemReturnSerializer
     permission_classes = [UserIsAdmin]
 
