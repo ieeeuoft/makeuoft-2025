@@ -328,7 +328,7 @@ MINIMUM_AGE = 17
 
 # Registration settings
 ACCOUNT_ACTIVATION_DAYS = 7
-RSVP_DAYS = 1
+RSVP_DAYS = 2
 
 # Team requirements
 MIN_MEMBERS = 2
