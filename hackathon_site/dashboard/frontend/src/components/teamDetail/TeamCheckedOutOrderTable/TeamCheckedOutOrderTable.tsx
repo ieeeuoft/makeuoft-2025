@@ -77,6 +77,24 @@ export const TeamCheckedOutOrderTable = () => {
     const toggleVisibility = () => {
         setVisibility(!visibility);
     };
+    const [selectedReturnQuantities, setSelectedReturnQuantities] = useState<
+        Record<number, number>
+    >({});
+
+    const handleQuantityChange = (rowId: number, value: unknown) => {
+        const parsedValue =
+            typeof value === "string"
+                ? parseInt(value, 10) || 0
+                : typeof value === "number"
+                ? value
+                : 0;
+
+        setSelectedReturnQuantities((prev) => ({
+            ...prev,
+            [rowId]: parsedValue,
+        }));
+    };
+
     const dispatch = useDispatch();
     const openProductOverviewPanel = (hardwareId: number) => {
         dispatch(getUpdatedHardwareDetails(hardwareId));
@@ -195,6 +213,12 @@ export const TeamCheckedOutOrderTable = () => {
                                                         >
                                                             Info
                                                         </TableCell>
+                                                        <TableCell
+                                                            className={`${styles.width1} ${styles.noWrap}`}
+                                                        >
+                                                            💳 Credits
+                                                        </TableCell>
+
                                                         {/*<TableCell*/}
                                                         {/*    className={`${styles.width1} ${styles.noWrap}`}*/}
                                                         {/*>*/}
@@ -239,167 +263,210 @@ export const TeamCheckedOutOrderTable = () => {
                                                 </TableHead>
                                                 <TableBody>
                                                     {checkedOutOrder.hardwareInTableRow.map(
-                                                        (row) => (
-                                                            <TableRow
-                                                                key={row.id}
-                                                                data-testid={`table-${checkedOutOrder.id}-${row.id}`}
-                                                            >
-                                                                <TableCell>
-                                                                    <img
-                                                                        className={
-                                                                            styles.itemImg
-                                                                        }
-                                                                        src={
-                                                                            hardware[
-                                                                                row.id
-                                                                            ]
-                                                                                ?.picture ??
-                                                                            hardware[
-                                                                                row.id
-                                                                            ]
-                                                                                ?.image_url ??
-                                                                            hardwareImagePlaceholder
-                                                                        }
-                                                                        alt={
+                                                        (row) => {
+                                                            const selectedQuantity =
+                                                                selectedReturnQuantities[
+                                                                    row.id
+                                                                ] ?? 0;
+                                                            const creditsPerUnit =
+                                                                hardware[row.id]
+                                                                    ?.credits ?? 0;
+                                                            const selectedCondition =
+                                                                props.values[
+                                                                    `${row.id}-condition`
+                                                                ] ?? "Healthy";
+
+                                                            // 🟢 Set total credits, but ensure it's 0 if "Broken" or "Lost"
+                                                            const totalCredits =
+                                                                selectedCondition ===
+                                                                    "Broken" ||
+                                                                selectedCondition ===
+                                                                    "Lost"
+                                                                    ? 0
+                                                                    : selectedQuantity *
+                                                                      creditsPerUnit;
+
+                                                            return (
+                                                                <TableRow
+                                                                    key={row.id}
+                                                                    data-testid={`table-${checkedOutOrder.id}-${row.id}`}
+                                                                >
+                                                                    <TableCell>
+                                                                        <img
+                                                                            className={
+                                                                                styles.itemImg
+                                                                            }
+                                                                            src={
+                                                                                hardware[
+                                                                                    row
+                                                                                        .id
+                                                                                ]
+                                                                                    ?.picture ??
+                                                                                hardware[
+                                                                                    row
+                                                                                        .id
+                                                                                ]
+                                                                                    ?.image_url ??
+                                                                                hardwareImagePlaceholder
+                                                                            }
+                                                                            alt={
+                                                                                hardware[
+                                                                                    row
+                                                                                        .id
+                                                                                ]?.name
+                                                                            }
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {
                                                                             hardware[
                                                                                 row.id
                                                                             ]?.name
                                                                         }
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    {
-                                                                        hardware[row.id]
-                                                                            ?.name
-                                                                    }
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <IconButton
-                                                                        color="inherit"
-                                                                        aria-label="Info"
-                                                                        data-testid="info-button"
-                                                                        onClick={() =>
-                                                                            openProductOverviewPanel(
-                                                                                row.id
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <Info />
-                                                                    </IconButton>
-                                                                </TableCell>
-                                                                {/* TODO: Add total quantity column */}
-                                                                {/*<TableCell>*/}
-                                                                {/*    {*/}
-                                                                {/*        hardware[row.id]*/}
-                                                                {/*            ?.quantity_available*/}
-                                                                {/*    }*/}
-                                                                {/*</TableCell>*/}
-                                                                <TableCell>
-                                                                    <div
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <IconButton
+                                                                            color="inherit"
+                                                                            aria-label="Info"
+                                                                            data-testid="info-button"
+                                                                            onClick={() =>
+                                                                                openProductOverviewPanel(
+                                                                                    row.id
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <Info />
+                                                                        </IconButton>
+                                                                    </TableCell>
+                                                                    {/* TODO: Add total quantity column */}
+                                                                    {/*<TableCell>*/}
+                                                                    {/*    {*/}
+                                                                    {/*        hardware[row.id]*/}
+                                                                    {/*            ?.quantity_available*/}
+                                                                    {/*    }*/}
+                                                                    {/*</TableCell>*/}
+                                                                    <TableCell
                                                                         style={{
-                                                                            display:
-                                                                                "flex",
-                                                                            alignItems:
-                                                                                "end",
+                                                                            textAlign:
+                                                                                "right",
+                                                                            fontWeight:
+                                                                                "bold",
+                                                                            color: "#28a745", // 🟢 Green for gained credits
                                                                         }}
                                                                     >
-                                                                        <Link
-                                                                            underline="always"
-                                                                            color="textPrimary"
+                                                                        {totalCredits}
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <div
                                                                             style={{
-                                                                                marginRight:
-                                                                                    "15px",
-                                                                            }}
-                                                                            data-testid={`all-button`}
-                                                                            onClick={() => {
-                                                                                props.setFieldValue(
-                                                                                    `${row.id}-quantity`,
-                                                                                    row.quantityGranted
-                                                                                );
+                                                                                display:
+                                                                                    "flex",
+                                                                                alignItems:
+                                                                                    "end",
                                                                             }}
                                                                         >
-                                                                            All
-                                                                        </Link>
+                                                                            <Link
+                                                                                underline="always"
+                                                                                color="textPrimary"
+                                                                                style={{
+                                                                                    marginRight:
+                                                                                        "15px",
+                                                                                }}
+                                                                                data-testid={`all-button`}
+                                                                                onClick={() => {
+                                                                                    props.setFieldValue(
+                                                                                        `${row.id}-quantity`,
+                                                                                        row.quantityGranted
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                All
+                                                                            </Link>
+                                                                            <Select
+                                                                                value={
+                                                                                    selectedQuantity
+                                                                                }
+                                                                                onChange={(
+                                                                                    e
+                                                                                ) =>
+                                                                                    handleQuantityChange(
+                                                                                        row.id,
+                                                                                        e
+                                                                                            .target
+                                                                                            .value ??
+                                                                                            0
+                                                                                    )
+                                                                                }
+                                                                                label="Qty"
+                                                                                labelId="qtyLabel"
+                                                                                name={`${row.id}-quantity`}
+                                                                                id={`${row.id}-quantity`}
+                                                                                data-testid={`select`}
+                                                                            >
+                                                                                {createDropdownList(
+                                                                                    row.quantityGranted
+                                                                                )}
+                                                                            </Select>
+                                                                        </div>
+                                                                    </TableCell>
+                                                                    <TableCell
+                                                                        align={"right"}
+                                                                    >
+                                                                        {
+                                                                            row.quantityGranted
+                                                                        }
+                                                                    </TableCell>
+                                                                    <TableCell>
                                                                         <Select
                                                                             value={
-                                                                                props
-                                                                                    .values[
-                                                                                    `${row.id}-quantity`
-                                                                                ]
+                                                                                selectedCondition
                                                                             }
                                                                             onChange={
                                                                                 props.handleChange
                                                                             }
-                                                                            label="Qty"
-                                                                            labelId="qtyLabel"
-                                                                            name={`${row.id}-quantity`}
-                                                                            id={`${row.id}-quantity`}
-                                                                            data-testid={`select`}
+                                                                            label="Condition"
+                                                                            labelId="conditionLabel"
+                                                                            name={`${row.id}-condition`}
+                                                                            id={`${row.id}-condition`}
+                                                                            defaultValue={
+                                                                                "Healthy"
+                                                                            }
                                                                         >
-                                                                            {createDropdownList(
-                                                                                row.quantityGranted
-                                                                            )}
+                                                                            <MenuItem value="Healthy">
+                                                                                Healthy
+                                                                            </MenuItem>
+                                                                            <MenuItem value="Heavily Used">
+                                                                                Heavily
+                                                                                Used
+                                                                            </MenuItem>
+                                                                            <MenuItem value="Broken">
+                                                                                Broken
+                                                                            </MenuItem>
+                                                                            <MenuItem value="Lost">
+                                                                                Lost
+                                                                            </MenuItem>
                                                                         </Select>
-                                                                    </div>
-                                                                </TableCell>
-                                                                <TableCell
-                                                                    align={"right"}
-                                                                >
-                                                                    {
-                                                                        row.quantityGranted
-                                                                    }
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Select
-                                                                        value={
-                                                                            props
-                                                                                .values[
-                                                                                `${row.id}-condition`
-                                                                            ]
-                                                                        }
-                                                                        onChange={
-                                                                            props.handleChange
-                                                                        }
-                                                                        label="Condition"
-                                                                        labelId="conditionLabel"
-                                                                        name={`${row.id}-condition`}
-                                                                        id={`${row.id}-condition`}
-                                                                        defaultValue={
-                                                                            "Healthy"
-                                                                        }
-                                                                    >
-                                                                        <MenuItem value="Healthy">
-                                                                            Healthy
-                                                                        </MenuItem>
-                                                                        <MenuItem value="Heavily Used">
-                                                                            Heavily Used
-                                                                        </MenuItem>
-                                                                        <MenuItem value="Broken">
-                                                                            Broken
-                                                                        </MenuItem>
-                                                                        <MenuItem value="Lost">
-                                                                            Lost
-                                                                        </MenuItem>
-                                                                    </Select>
-                                                                </TableCell>
-                                                                <TableCell align="center">
-                                                                    <Checkbox
-                                                                        color="primary"
-                                                                        checked={
-                                                                            props
-                                                                                .values[
-                                                                                `${row.id}-checkbox`
-                                                                            ] === true
-                                                                        }
-                                                                        name={`${row.id}-checkbox`}
-                                                                        onChange={
-                                                                            props.handleChange
-                                                                        }
-                                                                        data-testid={`${row.id}-checkbox`}
-                                                                    />
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        )
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        <Checkbox
+                                                                            color="primary"
+                                                                            checked={
+                                                                                props
+                                                                                    .values[
+                                                                                    `${row.id}-checkbox`
+                                                                                ] ===
+                                                                                true
+                                                                            }
+                                                                            name={`${row.id}-checkbox`}
+                                                                            onChange={
+                                                                                props.handleChange
+                                                                            }
+                                                                            data-testid={`${row.id}-checkbox`}
+                                                                        />
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            );
+                                                        }
                                                     )}
                                                 </TableBody>
                                             </Table>
