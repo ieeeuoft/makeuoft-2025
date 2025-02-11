@@ -12,13 +12,13 @@ import {
     TableHead,
     TableRow,
     Typography,
+    MenuItem,
+    Select,
 } from "@material-ui/core";
 import React, { useState } from "react";
 import Container from "@material-ui/core/Container";
 import styles from "components/general/OrderTables/OrderTables.module.scss";
 import hardwareImagePlaceholder from "assets/images/placeholders/no-hardware-image.svg";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
 import {
     GeneralOrderTableTitle,
     GeneralOrderTitle,
@@ -77,11 +77,24 @@ export const TeamCheckedOutOrderTable = () => {
     const toggleVisibility = () => {
         setVisibility(!visibility);
     };
+
+    // Local state for selected return quantities
     const [selectedReturnQuantities, setSelectedReturnQuantities] = useState<
         Record<number, number>
     >({});
 
-    const handleQuantityChange = (rowId: number, value: unknown) => {
+    const dispatch = useDispatch();
+    const openProductOverviewPanel = (hardwareId: number) => {
+        dispatch(getUpdatedHardwareDetails(hardwareId));
+        dispatch(openProductOverview());
+    };
+
+    // Update both local state and Formik's state on quantity change
+    const handleQuantityChange = (
+        rowId: number,
+        value: unknown,
+        setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void
+    ) => {
         const parsedValue =
             typeof value === "string"
                 ? parseInt(value, 10) || 0
@@ -89,17 +102,16 @@ export const TeamCheckedOutOrderTable = () => {
                 ? value
                 : 0;
 
+        // Update local state
         setSelectedReturnQuantities((prev) => ({
             ...prev,
             [rowId]: parsedValue,
         }));
+
+        // Sync with Formik's state
+        setFieldValue(`${rowId}-quantity`, parsedValue.toString());
     };
 
-    const dispatch = useDispatch();
-    const openProductOverviewPanel = (hardwareId: number) => {
-        dispatch(getUpdatedHardwareDetails(hardwareId));
-        dispatch(openProductOverview());
-    };
     const handleReturnOrder = (values: FormikValues, orderId: number) => {
         try {
             // Find the order by ID
@@ -108,8 +120,8 @@ export const TeamCheckedOutOrderTable = () => {
                 throw new Error("Order not found.");
             }
 
-            // Convert formik values to correct format
-            const hardware: {
+            // Convert Formik values to the correct format
+            const hardwareReturnData: {
                 id: number;
                 quantity: number;
                 part_returned_health: string;
@@ -118,20 +130,20 @@ export const TeamCheckedOutOrderTable = () => {
             for (let i = 0; i < keys.length; i += 3) {
                 const id = parseInt(keys[i].split("-")[0]);
                 if (values[keys[i + 1]]) {
-                    hardware.push({
+                    hardwareReturnData.push({
                         id,
-                        quantity: values[keys[i]],
-                        part_returned_health: values[keys[i + 2]],
+                        quantity: parseInt(values[keys[i]] as string, 10),
+                        part_returned_health: values[keys[i + 2]] as string,
                     });
                 }
             }
 
-            dispatch(returnItems({ hardware, order: orderId }));
+            dispatch(returnItems({ hardware: hardwareReturnData, order: orderId }));
 
             // Check if all items in the order have been returned
             const allItemsReturned = checkedOutOrder.hardwareInTableRow.every((row) => {
                 const returnedQuantity =
-                    hardware.find((h) => h.id === row.id)?.quantity || 0;
+                    hardwareReturnData.find((h) => h.id === row.id)?.quantity || 0;
                 const remainingQty = (row.quantityGranted || 0) - returnedQuantity;
                 return remainingQty === 0;
             });
@@ -218,12 +230,6 @@ export const TeamCheckedOutOrderTable = () => {
                                                         >
                                                             💳 Credits
                                                         </TableCell>
-
-                                                        {/*<TableCell*/}
-                                                        {/*    className={`${styles.width1} ${styles.noWrap}`}*/}
-                                                        {/*>*/}
-                                                        {/*    Qty*/}
-                                                        {/*</TableCell>*/}
                                                         <TableCell
                                                             className={`${styles.width1} ${styles.noWrap}`}
                                                         >
@@ -264,19 +270,28 @@ export const TeamCheckedOutOrderTable = () => {
                                                 <TableBody>
                                                     {checkedOutOrder.hardwareInTableRow.map(
                                                         (row) => {
+                                                            // Use local state if available; otherwise, default to Formik's value.
+                                                            // Here we type-cast the value from Formik as a string.
                                                             const selectedQuantity =
                                                                 selectedReturnQuantities[
                                                                     row.id
-                                                                ] ?? 0;
+                                                                ] ??
+                                                                parseInt(
+                                                                    props.values[
+                                                                        `${row.id}-quantity`
+                                                                    ] as string,
+                                                                    10
+                                                                );
                                                             const creditsPerUnit =
                                                                 hardware[row.id]
                                                                     ?.credits ?? 0;
                                                             const selectedCondition =
-                                                                props.values[
+                                                                (props.values[
                                                                     `${row.id}-condition`
-                                                                ] ?? "Healthy";
+                                                                ] as string) ||
+                                                                "Healthy";
 
-                                                            // 🟢 Set total credits, but ensure it's 0 if "Broken" or "Lost"
+                                                            // Calculate total credits (set to 0 if condition is Broken or Lost)
                                                             const totalCredits =
                                                                 selectedCondition ===
                                                                     "Broken" ||
@@ -338,20 +353,13 @@ export const TeamCheckedOutOrderTable = () => {
                                                                             <Info />
                                                                         </IconButton>
                                                                     </TableCell>
-                                                                    {/* TODO: Add total quantity column */}
-                                                                    {/*<TableCell>*/}
-                                                                    {/*    {*/}
-                                                                    {/*        hardware[row.id]*/}
-                                                                    {/*            ?.quantity_available*/}
-                                                                    {/*    }*/}
-                                                                    {/*</TableCell>*/}
                                                                     <TableCell
                                                                         style={{
                                                                             textAlign:
                                                                                 "right",
                                                                             fontWeight:
                                                                                 "bold",
-                                                                            color: "#28a745", // 🟢 Green for gained credits
+                                                                            color: "#28a745",
                                                                         }}
                                                                     >
                                                                         {totalCredits}
@@ -374,9 +382,19 @@ export const TeamCheckedOutOrderTable = () => {
                                                                                 }}
                                                                                 data-testid={`all-button`}
                                                                                 onClick={() => {
+                                                                                    // Update both Formik and local state with the full quantity
                                                                                     props.setFieldValue(
                                                                                         `${row.id}-quantity`,
-                                                                                        row.quantityGranted
+                                                                                        row.quantityGranted.toString()
+                                                                                    );
+                                                                                    setSelectedReturnQuantities(
+                                                                                        (
+                                                                                            prev
+                                                                                        ) => ({
+                                                                                            ...prev,
+                                                                                            [row.id]:
+                                                                                                row.quantityGranted,
+                                                                                        })
                                                                                     );
                                                                                 }}
                                                                             >
@@ -393,8 +411,8 @@ export const TeamCheckedOutOrderTable = () => {
                                                                                         row.id,
                                                                                         e
                                                                                             .target
-                                                                                            .value ??
-                                                                                            0
+                                                                                            .value,
+                                                                                        props.setFieldValue
                                                                                     )
                                                                                 }
                                                                                 label="Qty"
