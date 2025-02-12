@@ -476,14 +476,30 @@ export const TeamPendingOrderTable = () => {
                                                     data-testid={`complete-button-${pendingOrder.id}`}
                                                     disabled={
                                                         isLoading ||
-                                                        Object.keys(
-                                                            props.values
-                                                        ).findIndex(
-                                                            (key) =>
-                                                                key.includes(
-                                                                    "checkbox"
-                                                                ) && props.values[key]
-                                                        ) === -1
+                                                        // Check if all quantity fields are zero
+                                                        Object.keys(props.values)
+                                                            .filter((key) =>
+                                                                key.endsWith(
+                                                                    "-quantity"
+                                                                )
+                                                            )
+                                                            .every(
+                                                                (key) =>
+                                                                    props.values[
+                                                                        key
+                                                                    ] === "0"
+                                                            ) ||
+                                                        // Check if no checkbox is selected
+                                                        Object.keys(props.values)
+                                                            .filter((key) =>
+                                                                key.endsWith(
+                                                                    "-checkbox"
+                                                                )
+                                                            )
+                                                            .every(
+                                                                (key) =>
+                                                                    !props.values[key]
+                                                            )
                                                     }
                                                 >
                                                     Complete Order
