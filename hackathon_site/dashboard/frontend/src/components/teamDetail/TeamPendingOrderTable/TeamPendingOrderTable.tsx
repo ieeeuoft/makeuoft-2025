@@ -27,12 +27,14 @@ import {
 import { Formik, FormikValues } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import {
+    getCreditsUsedSelector,
     isLoadingSelector,
     pendingOrdersSelector,
     UpdateOrderAttributes,
     updateOrderStatus,
 } from "slices/order/teamOrderSlice";
 import { hardwareSelectors } from "slices/hardware/hardwareSlice";
+import { teamStartingCreditsSelector } from "slices/event/teamDetailSlice";
 
 const createDropdownList = (number: number) => {
     let entry = [];
@@ -66,6 +68,10 @@ export const TeamPendingOrderTable = () => {
     const hardware = useSelector(hardwareSelectors.selectEntities);
     const isLoading = useSelector(isLoadingSelector);
     const [visibility, setVisibility] = useState(true);
+    const creditsAvailable = useSelector(teamStartingCreditsSelector);
+    const creditsUsed = useSelector(getCreditsUsedSelector);
+    const creditsRemaining = creditsAvailable ? creditsAvailable - creditsUsed : 0;
+
     const [selectedQuantities, setSelectedQuantities] = useState<
         Record<number, number>
     >({});
@@ -160,6 +166,7 @@ export const TeamPendingOrderTable = () => {
                                         <GeneralOrderTableTitle
                                             orderId={pendingOrder.id}
                                             orderStatus={pendingOrder.status}
+                                            overLimit={creditsRemaining < 0}
                                         />
                                         <TableContainer
                                             component={Paper}

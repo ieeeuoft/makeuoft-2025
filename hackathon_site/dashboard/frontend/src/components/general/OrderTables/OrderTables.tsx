@@ -8,10 +8,10 @@ import Chip from "@material-ui/core/Chip";
 import CheckCircle from "@material-ui/icons/CheckCircle";
 import WatchLater from "@material-ui/icons/WatchLater";
 import Error from "@material-ui/icons/Error";
+import MoneyOff from "@material-ui/icons/MoneyOff";
 import EditIcon from "@material-ui/icons/Edit";
 import UpdateIcon from "@material-ui/icons/Update";
 import {
-    Grid,
     Paper,
     Table,
     TableBody,
@@ -26,7 +26,14 @@ import { hardwareSelectors } from "slices/hardware/hardwareSlice";
 import { formatDateTime } from "api/helpers";
 import { userTypeSelector } from "slices/users/userSlice";
 
-export const ChipStatus = ({ status }: { status: OrderStatus | "Error" }) => {
+// Extend the props to include an optional "overLimit" boolean.
+export const ChipStatus = ({
+    status,
+    overLimit,
+}: {
+    status: OrderStatus | "Error";
+    overLimit?: boolean;
+}) => {
     switch (status) {
         case "Ready for Pickup":
             return (
@@ -38,11 +45,20 @@ export const ChipStatus = ({ status }: { status: OrderStatus | "Error" }) => {
             );
         case "Submitted":
             return (
-                <Chip
-                    icon={<WatchLater />}
-                    label="In progress"
-                    className={`${styles.chipOrange} ${styles.chip}`}
-                />
+                <>
+                    <Chip
+                        icon={<WatchLater />}
+                        label="In progress"
+                        className={`${styles.chipOrange} ${styles.chip}`}
+                    />
+                    {overLimit && (
+                        <Chip
+                            icon={<MoneyOff />}
+                            label="Over credit limit"
+                            className={`${styles.chipRed} ${styles.chip}`}
+                        />
+                    )}
+                </>
             );
         case "Error":
             return (
@@ -89,6 +105,7 @@ interface GeneralOrderTableTitleProps {
     createdTime?: string;
     updatedTime?: string;
     additionalChipFormatting?: boolean;
+    overLimit?: boolean;
 }
 
 export const GeneralOrderTableTitle = ({
@@ -97,6 +114,7 @@ export const GeneralOrderTableTitle = ({
     createdTime,
     updatedTime,
     additionalChipFormatting,
+    overLimit,
 }: GeneralOrderTableTitleProps) => (
     <Container className={styles.titleChip} maxWidth={false} disableGutters={true}>
         <Typography variant="h2" className={styles.titleChipText}>
@@ -109,7 +127,7 @@ export const GeneralOrderTableTitle = ({
                 maxWidth={false}
                 disableGutters={true}
             >
-                <ChipStatus status={orderStatus} />
+                <ChipStatus status={orderStatus} overLimit={overLimit} />
             </Container>
         )}
 
