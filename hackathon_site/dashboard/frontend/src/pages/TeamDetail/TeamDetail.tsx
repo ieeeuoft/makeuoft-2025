@@ -76,7 +76,7 @@ const TeamDetail = ({ match }: RouteComponentProps<PageParams>) => {
                 <Grid container direction="column" spacing={6}>
                     <Grid item xs={12}>
                         <Typography variant="h1">
-                            Team {teamCode} Overview - (🪙 {creditsRemaining} Credits
+                            Team {teamCode} Overview - (💳 {creditsRemaining} Credits
                             Left)
                         </Typography>
                     </Grid>
