@@ -277,7 +277,7 @@ class OrderDetailView(generics.GenericAPIView, mixins.UpdateModelMixin):
     def patch(self, request, *args, **kwargs):
         # partial_update uses our serializer which now accepts 'cancellation_message'
         response = self.partial_update(request, *args, **kwargs)
-        
+
         if "status" in request.data:
             # Retrieve the optional cancellation message from the request
             cancellation_message = request.data.get("cancellation_message")
@@ -299,7 +299,9 @@ class OrderDetailView(generics.GenericAPIView, mixins.UpdateModelMixin):
 
                 # Add the cancellation message to the context if one was provided.
                 if cancellation_message:
-                    render_to_string_context["cancellation_message"] = cancellation_message
+                    render_to_string_context[
+                        "cancellation_message"
+                    ] = cancellation_message
 
                 send_mail(
                     subject=render_to_string(
@@ -327,16 +329,13 @@ class OrderDetailView(generics.GenericAPIView, mixins.UpdateModelMixin):
                     }
                     profile.user.email_user(
                         subject=render_to_string(
-                            self.update_order_email_subject_template,
-                            context,
+                            self.update_order_email_subject_template, context,
                         ),
                         message=render_to_string(
-                            self.update_order_email_template_participant,
-                            context,
+                            self.update_order_email_template_participant, context,
                         ),
                         html_message=render_to_string(
-                            self.update_order_email_template_participant,
-                            context,
+                            self.update_order_email_template_participant, context,
                         ),
                         from_email=settings.DEFAULT_FROM_EMAIL,
                         connection=connection,
