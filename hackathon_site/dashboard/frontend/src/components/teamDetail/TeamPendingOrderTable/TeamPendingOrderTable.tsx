@@ -609,7 +609,12 @@ export const TeamPendingOrderTable = () => {
                     </Formik>
                 ))}
 
-            <Dialog open={showRejectDialog} onClose={() => setShowRejectDialog(false)}>
+            <Dialog
+                open={showRejectDialog}
+                onClose={() => setShowRejectDialog(false)}
+                fullWidth
+                maxWidth="md" // you can use "sm", "md", "lg", or "xl" as needed
+            >
                 <DialogTitle>Cancel Order</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -618,12 +623,17 @@ export const TeamPendingOrderTable = () => {
                         label="Cancellation Message (optional)"
                         type="text"
                         fullWidth
+                        multiline
+                        rows={4} // increases the input area for multiline text
                         value={cancelMsg}
                         onChange={(e) => setCancelMsg(e.target.value)}
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setShowRejectDialog(false)} color="primary">
+                    <Button
+                        onClick={() => setShowRejectDialog(false)}
+                        color="secondary"
+                    >
                         Cancel
                     </Button>
                     <Button
