@@ -167,6 +167,11 @@ class OrderListSerializer(serializers.ModelSerializer):
 
 
 class OrderChangeSerializer(OrderListSerializer):
+    # Add an optional field for the cancellation message.
+    cancellation_message = serializers.CharField(
+        required=False, allow_blank=True, write_only=True
+    )
+
     change_options = {
         "Submitted": ["Cancelled", "Ready for Pickup"],
         "Ready for Pickup": ["Picked Up", "Submitted"],
@@ -175,7 +180,8 @@ class OrderChangeSerializer(OrderListSerializer):
 
     class Meta:
         model = Order
-        fields = OrderListSerializer.Meta.fields
+        # Append the new field to your serializer fields.
+        fields = OrderListSerializer.Meta.fields + ("cancellation_message",)
         read_only_fields = (
             "id",
             "hardware",
@@ -200,13 +206,16 @@ class OrderChangeSerializer(OrderListSerializer):
         return data
 
     def update(self, instance: Order, validated_data):
+        # Remove the optional cancellation message from the validated data
+        # so it isn’t passed to the model update.
+        cancellation_message = validated_data.pop("cancellation_message", None)
         status = validated_data.pop("status", None)
-        request = validated_data.pop("request", None)
+        request_field = validated_data.pop("request", None)
 
         if status is not None:
             instance.status = status
-        if request is not None:
-            for item in request:
+        if request_field is not None:
+            for item in request_field:
                 items_in_order = list(
                     OrderItem.objects.filter(hardware=item["id"], order=instance.pk)
                 )
@@ -224,8 +233,10 @@ class OrderChangeSerializer(OrderListSerializer):
                         items_in_order[idx].part_returned_health = None
                     items_in_order[idx].save()
 
-        return serializers.ModelSerializer.update(self, instance, validated_data)
+        # (If you want to do something with cancellation_message at the model level,
+        # you could store it in a log or similar here.)
 
+        return serializers.ModelSerializer.update(self, instance, validated_data)
 
 class TeamOrderChangeSerializer(OrderChangeSerializer):
     change_options = {
@@ -241,22 +252,22 @@ class OrderCreateSerializer(serializers.Serializer):
         hardware_name = serializers.SerializerMethodField()
         quantity = serializers.IntegerField(required=True)
 
-    def get_hardware_name(self, obj):
-        """
-        Handles cases where obj is a dictionary instead of a model instance.
-        """
-        if isinstance(obj, dict):  # Handles case when obj is an OrderedDict
-            hardware = obj.get("id")  # Directly retrieve hardware instance if available
-            if isinstance(hardware, Hardware):  # If it's already a model instance
-                return hardware.name
-            elif isinstance(hardware, int):  # If it's an ID, fetch from DB
-                return Hardware.objects.get(id=hardware).name
-            return "Unknown Hardware"
+        def get_hardware_name(self, obj):
+            """
+            Handles cases where obj is a dictionary instead of a model instance.
+            """
+            if isinstance(obj, dict):  # Handles case when obj is an OrderedDict
+                hardware = obj.get("id")  # Directly retrieve hardware instance if available
+                if isinstance(hardware, Hardware):  # If it's already a model instance
+                    return hardware.name
+                elif isinstance(hardware, int):  # If it's an ID, fetch from DB
+                    return Hardware.objects.get(id=hardware).name
+                return "Unknown Hardware"
 
-        if isinstance(obj, Hardware):  # If obj is a Hardware model instance
-            return obj.name
+            if isinstance(obj, Hardware):  # If obj is a Hardware model instance
+                return obj.name
 
-        return getattr(obj, "id", None) and getattr(obj.id, "name", "Unknown Hardware")
+            return getattr(obj, "id", None) and getattr(obj.id, "name", "Unknown Hardware")
 
 
     hardware = OrderCreateHardwareSerializer(many=True, required=True)
