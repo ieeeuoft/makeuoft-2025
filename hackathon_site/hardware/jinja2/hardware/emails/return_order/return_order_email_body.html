@@ -6,6 +6,7 @@
     <thead>
         <tr>
             <th>Item ID</th>
+            <th>Name</th>
             <th>Quantity Returned</th>
         </tr>
     </thead>
@@ -13,6 +14,7 @@
         {% for item in order.returned_items %}
             <tr>
                 <td> {{ item.hardware_id }} </td>
+                <td> {{ item.hardware_name }} </td>
                 <td> {{ item.quantity }} </td>
             </tr>
         {% endfor %}

@@ -284,6 +284,7 @@ interface MainSectionProps {
     quantityRemaining: number;
     categories: string[];
     picture: string;
+    credits: number;
 }
 const MainSection = ({
     name,
@@ -291,6 +292,7 @@ const MainSection = ({
     quantityRemaining,
     categories,
     picture,
+    credits,
 }: MainSectionProps) => {
     const userType = useSelector(userTypeSelector);
     const availability =
@@ -311,6 +313,11 @@ const MainSection = ({
             <div>
                 <Typography variant="h6">{name}</Typography>
                 {availability}
+                {credits && (
+                    <Typography variant="body2" className={styles.credits}>
+                        Credits: {credits}
+                    </Typography>
+                )}
                 {categories.length > 0 && (
                     <>
                         <Typography variant="body2" className={styles.heading}>
@@ -409,6 +416,7 @@ export const ProductOverview = ({
                                 hardware.image_url ??
                                 hardwareImagePlaceholder
                             }
+                            credits={hardware.credits}
                         />
                         <DetailInfoSection
                             manufacturer={hardware.manufacturer}

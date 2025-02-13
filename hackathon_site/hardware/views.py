@@ -275,21 +275,34 @@ class OrderDetailView(generics.GenericAPIView, mixins.UpdateModelMixin):
     )
 
     def patch(self, request, *args, **kwargs):
+        # partial_update uses our serializer which now accepts 'cancellation_message'
         response = self.partial_update(request, *args, **kwargs)
 
         if "status" in request.data:
+            # Retrieve the optional cancellation message from the request
+            cancellation_message = request.data.get("cancellation_message")
             profiles = Profile.objects.filter(team__exact=response.data["team_id"])
             connection = mail.get_connection(fail_silently=False)
             connection.open()
 
             try:
+                # If status is "Submitted", don't send any emails.
                 if response.data["status"] == "Submitted":
                     return response
+
+                # Build the basic email context
                 render_to_string_context = {
                     "recipient": "Hardware Inventory Admins",
                     "order": response.data,
                     "order_status_message": ORDER_STATUS_MSG[response.data["status"]],
                 }
+
+                # Add the cancellation message to the context if one was provided.
+                if cancellation_message:
+                    render_to_string_context[
+                        "cancellation_message"
+                    ] = cancellation_message
+
                 send_mail(
                     subject=render_to_string(
                         self.update_order_email_subject_template,
@@ -305,8 +318,9 @@ class OrderDetailView(generics.GenericAPIView, mixins.UpdateModelMixin):
                     connection=connection,
                     recipient_list=[settings.HSS_ADMIN_EMAIL],
                 )
+
                 for profile in profiles:
-                    render_to_string_context = {
+                    context = {
                         **render_to_string_context,
                         "recipient": profile.user,
                         "order_status_closing_message": ORDER_STATUS_CLOSING_MSG[
@@ -315,16 +329,13 @@ class OrderDetailView(generics.GenericAPIView, mixins.UpdateModelMixin):
                     }
                     profile.user.email_user(
                         subject=render_to_string(
-                            self.update_order_email_subject_template,
-                            render_to_string_context,
+                            self.update_order_email_subject_template, context,
                         ),
                         message=render_to_string(
-                            self.update_order_email_template_participant,
-                            render_to_string_context,
+                            self.update_order_email_template_participant, context,
                         ),
                         html_message=render_to_string(
-                            self.update_order_email_template_participant,
-                            render_to_string_context,
+                            self.update_order_email_template_participant, context,
                         ),
                         from_email=settings.DEFAULT_FROM_EMAIL,
                         connection=connection,

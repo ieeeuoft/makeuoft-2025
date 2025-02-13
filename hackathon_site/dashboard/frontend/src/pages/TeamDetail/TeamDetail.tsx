@@ -12,6 +12,7 @@ import { AdminReturnedItemsTable } from "components/teamDetail/SimpleOrderTables
 import {
     errorSelector,
     getAdminTeamOrders,
+    getCreditsUsedSelector,
     hardwareInOrdersSelector,
 } from "slices/order/teamOrderSlice";
 
@@ -19,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     getTeamInfoData,
     teamInfoErrorSelector,
+    teamStartingCreditsSelector,
     updateParticipantIdErrorSelector,
 } from "slices/event/teamDetailSlice";
 import AlertBox from "components/general/AlertBox/AlertBox";
@@ -40,6 +42,9 @@ const TeamDetail = ({ match }: RouteComponentProps<PageParams>) => {
     const teamCode = match.params.code.toUpperCase();
     const teamInfoError = useSelector(teamInfoErrorSelector);
     const orderError = useSelector(errorSelector);
+    const creditsAvailable = useSelector(teamStartingCreditsSelector);
+    const creditsUsed = useSelector(getCreditsUsedSelector);
+    const creditsRemaining = creditsAvailable ? creditsAvailable - creditsUsed : 0;
 
     const updateParticipantIdError = useSelector(updateParticipantIdErrorSelector);
     if (
@@ -70,7 +75,10 @@ const TeamDetail = ({ match }: RouteComponentProps<PageParams>) => {
             ) : (
                 <Grid container direction="column" spacing={6}>
                     <Grid item xs={12}>
-                        <Typography variant="h1">Team {teamCode} Overview</Typography>
+                        <Typography variant="h1">
+                            Team {teamCode} Overview - (💳 {creditsRemaining} Credits
+                            Left)
+                        </Typography>
                     </Grid>
                     <Grid
                         item

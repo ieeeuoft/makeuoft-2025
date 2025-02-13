@@ -8,6 +8,7 @@ import Chip from "@material-ui/core/Chip";
 import CheckCircle from "@material-ui/icons/CheckCircle";
 import WatchLater from "@material-ui/icons/WatchLater";
 import Error from "@material-ui/icons/Error";
+import MoneyOff from "@material-ui/icons/MoneyOff";
 import EditIcon from "@material-ui/icons/Edit";
 import UpdateIcon from "@material-ui/icons/Update";
 import {
@@ -23,8 +24,16 @@ import hardwareImagePlaceholder from "assets/images/placeholders/no-hardware-ima
 import { useSelector } from "react-redux";
 import { hardwareSelectors } from "slices/hardware/hardwareSlice";
 import { formatDateTime } from "api/helpers";
+import { userTypeSelector } from "slices/users/userSlice";
 
-export const ChipStatus = ({ status }: { status: OrderStatus | "Error" }) => {
+// Extend the props to include an optional "overLimit" boolean.
+export const ChipStatus = ({
+    status,
+    overLimit,
+}: {
+    status: OrderStatus | "Error";
+    overLimit?: boolean;
+}) => {
     switch (status) {
         case "Ready for Pickup":
             return (
@@ -36,11 +45,20 @@ export const ChipStatus = ({ status }: { status: OrderStatus | "Error" }) => {
             );
         case "Submitted":
             return (
-                <Chip
-                    icon={<WatchLater />}
-                    label="In progress"
-                    className={`${styles.chipOrange} ${styles.chip}`}
-                />
+                <>
+                    <Chip
+                        icon={<WatchLater />}
+                        label="In progress"
+                        className={`${styles.chipOrange} ${styles.chip}`}
+                    />
+                    {overLimit && (
+                        <Chip
+                            icon={<MoneyOff />}
+                            label="Over credit limit"
+                            className={`${styles.chipRed} ${styles.chip}`}
+                        />
+                    )}
+                </>
             );
         case "Error":
             return (
@@ -87,6 +105,7 @@ interface GeneralOrderTableTitleProps {
     createdTime?: string;
     updatedTime?: string;
     additionalChipFormatting?: boolean;
+    overLimit?: boolean;
 }
 
 export const GeneralOrderTableTitle = ({
@@ -95,6 +114,7 @@ export const GeneralOrderTableTitle = ({
     createdTime,
     updatedTime,
     additionalChipFormatting,
+    overLimit,
 }: GeneralOrderTableTitleProps) => (
     <Container className={styles.titleChip} maxWidth={false} disableGutters={true}>
         <Typography variant="h2" className={styles.titleChipText}>
@@ -107,7 +127,7 @@ export const GeneralOrderTableTitle = ({
                 maxWidth={false}
                 disableGutters={true}
             >
-                <ChipStatus status={orderStatus} />
+                <ChipStatus status={orderStatus} overLimit={overLimit} />
             </Container>
         )}
 
@@ -227,6 +247,7 @@ export const GeneralReturnTable = ({
     fetchOrdersError?: string | null;
 }) => {
     const hardware = useSelector(hardwareSelectors.selectEntities);
+    const isAdmin = useSelector(userTypeSelector) === "admin";
 
     return (
         <Container
@@ -250,96 +271,169 @@ export const GeneralReturnTable = ({
                             : "Please bring items to the tech table and a tech team member will assist you."}
                     </Paper>
                 ) : (
-                    orders.map((order) => (
-                        <div
-                            key={order.id}
-                            data-testid={`returned-order-table-${order.id}`}
-                            data-updated-time={`returned-order-time-${order.hardwareInOrder[0].time}`}
-                        >
-                            <GeneralOrderTableTitle orderId={order.id} />
-                            <TableContainer
-                                component={Paper}
-                                elevation={2}
-                                square={true}
+                    orders.map((order) => {
+                        // Compute the subtotal for this order.
+                        const orderRefundedCredits = order.hardwareInOrder.reduce(
+                            (sum, row) => {
+                                const creditsPerUnit =
+                                    hardware[row.hardware_id]?.credits ?? 0;
+                                // If the item is Broken or Lost, its refunded credits are 0.
+                                const rowTotal =
+                                    row.part_returned_health === "Broken" ||
+                                    row.part_returned_health === "Lost"
+                                        ? 0
+                                        : row.quantity * creditsPerUnit;
+                                return sum + rowTotal;
+                            },
+                            0
+                        );
+                        return (
+                            <div
+                                key={order.id}
+                                data-testid={`returned-order-table-${order.id}`}
+                                data-updated-time={`returned-order-time-${order.hardwareInOrder[0].time}`}
                             >
-                                <Table
-                                    className={styles.table}
-                                    size="small"
-                                    aria-label="returned table"
+                                <GeneralOrderTableTitle orderId={order.id} />
+                                {/* Only show the credit subtotal if the user is admin */}
+                                {isAdmin && (
+                                    <Typography
+                                        variant="subtitle1"
+                                        color="textPrimary"
+                                        style={{
+                                            textAlign: "right",
+                                        }}
+                                    >
+                                        Total Credits Refunded: 💳{" "}
+                                        {orderRefundedCredits}
+                                    </Typography>
+                                )}
+                                <TableContainer
+                                    component={Paper}
+                                    elevation={2}
+                                    square={true}
                                 >
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell className={styles.widthFixed} />
-                                            <TableCell
-                                                className={styles.width6}
-                                                align="left"
-                                            >
-                                                Name
-                                            </TableCell>
-                                            <TableCell
-                                                className={styles.widthFixed}
-                                                align="right"
-                                            >
-                                                Qty
-                                            </TableCell>
-                                            <TableCell
-                                                className={styles.width4}
-                                                align="right"
-                                            >
-                                                Time
-                                            </TableCell>
-                                            <TableCell
-                                                align="left"
-                                                className={styles.width2}
-                                            >
-                                                Condition
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {order.hardwareInOrder.map((row) => (
-                                            <TableRow key={row.id}>
-                                                <TableCell align="left">
-                                                    <img
-                                                        className={styles.itemImg}
-                                                        src={
-                                                            hardware[row.hardware_id]
-                                                                ?.picture ??
-                                                            hardware[row.hardware_id]
-                                                                ?.image_url ??
-                                                            hardwareImagePlaceholder
-                                                        }
-                                                        alt={
-                                                            hardware[row.hardware_id]
-                                                                ?.name
-                                                        }
-                                                    />
+                                    <Table
+                                        className={styles.table}
+                                        size="small"
+                                        aria-label="returned table"
+                                    >
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell
+                                                    className={styles.widthFixed}
+                                                />
+                                                <TableCell
+                                                    className={styles.width6}
+                                                    align="left"
+                                                >
+                                                    Name
                                                 </TableCell>
-                                                <TableCell align="left">
-                                                    {hardware[row.hardware_id]?.name}
-                                                </TableCell>
-                                                <TableCell align="right">
-                                                    {row.quantity}
+                                                {isAdmin && (
+                                                    <TableCell
+                                                        className={styles.width4}
+                                                        align="right"
+                                                    >
+                                                        💳 Credits
+                                                    </TableCell>
+                                                )}
+                                                <TableCell
+                                                    className={styles.widthFixed}
+                                                    align="right"
+                                                >
+                                                    Qty
                                                 </TableCell>
                                                 <TableCell
+                                                    className={styles.width4}
                                                     align="right"
-                                                    className={styles.noWrap}
                                                 >
-                                                    {row.time}
+                                                    Time
                                                 </TableCell>
                                                 <TableCell
                                                     align="left"
-                                                    className={styles.noWrap}
+                                                    className={styles.width2}
                                                 >
-                                                    {row.part_returned_health}
+                                                    Condition
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </div>
-                    ))
+                                        </TableHead>
+                                        <TableBody>
+                                            {order.hardwareInOrder.map((row) => {
+                                                const creditsPerUnit =
+                                                    hardware[row.hardware_id]
+                                                        ?.credits ?? 0;
+                                                const totalCredits =
+                                                    row.part_returned_health ===
+                                                        "Lost" ||
+                                                    row.part_returned_health ===
+                                                        "Broken"
+                                                        ? 0
+                                                        : row.quantity * creditsPerUnit;
+
+                                                return (
+                                                    <TableRow key={row.id}>
+                                                        <TableCell align="left">
+                                                            <img
+                                                                className={
+                                                                    styles.itemImg
+                                                                }
+                                                                src={
+                                                                    hardware[
+                                                                        row.hardware_id
+                                                                    ]?.picture ??
+                                                                    hardware[
+                                                                        row.hardware_id
+                                                                    ]?.image_url ??
+                                                                    hardwareImagePlaceholder
+                                                                }
+                                                                alt={
+                                                                    hardware[
+                                                                        row.hardware_id
+                                                                    ]?.name
+                                                                }
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell align="left">
+                                                            {
+                                                                hardware[
+                                                                    row.hardware_id
+                                                                ]?.name
+                                                            }
+                                                        </TableCell>
+                                                        {isAdmin && (
+                                                            <TableCell
+                                                                align="right"
+                                                                style={{
+                                                                    fontWeight: "bold",
+                                                                    color: "#28a745", // Green for refunded credits
+                                                                }}
+                                                            >
+                                                                {totalCredits}
+                                                            </TableCell>
+                                                        )}
+                                                        <TableCell align="right">
+                                                            {row.quantity}
+                                                        </TableCell>
+                                                        <TableCell
+                                                            align="right"
+                                                            className={styles.noWrap}
+                                                        >
+                                                            {row.time}
+                                                        </TableCell>
+                                                        <TableCell
+                                                            align="left"
+                                                            className={styles.noWrap}
+                                                        >
+                                                            {row.part_returned_health}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </div>
+                        );
+                    })
                 ))}
         </Container>
     );

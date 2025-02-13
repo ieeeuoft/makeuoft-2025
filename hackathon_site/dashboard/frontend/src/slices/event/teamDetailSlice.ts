@@ -8,6 +8,7 @@ import { AppDispatch, RootState } from "slices/store";
 import { displaySnackbar } from "slices/ui/uiSlice";
 import { get, patch } from "api/api";
 import { Profile, ProfileWithUser, Team } from "api/types";
+import { startingCredits } from "constants.js";
 
 interface TeamDetailExtraState {
     isTeamInfoLoading: boolean;
@@ -15,6 +16,7 @@ interface TeamDetailExtraState {
     teamInfoError: string | null;
     participantIdError: string | null;
     projectDescription: string | null;
+    credits: number;
 }
 
 const extraState: TeamDetailExtraState = {
@@ -23,6 +25,7 @@ const extraState: TeamDetailExtraState = {
     teamInfoError: null,
     participantIdError: null,
     projectDescription: null,
+    credits: startingCredits,
 };
 
 const teamDetailAdapter = createEntityAdapter<ProfileWithUser>();
@@ -157,6 +160,7 @@ const teamDetailSlice = createSlice({
             state.teamInfoError = null;
 
             state.projectDescription = payload.project_description;
+            state.credits = payload.credits;
             teamDetailAdapter.setAll(state, payload.profiles);
         });
         builder.addCase(getTeamInfoData.rejected, (state, { payload }) => {
@@ -235,4 +239,9 @@ export const updateParticipantIdErrorSelector = createSelector(
 export const projectDescriptionSelector = createSelector(
     [teamDetailSliceSelector],
     (teamDetailSlice) => teamDetailSlice.projectDescription
+);
+
+export const teamStartingCreditsSelector = createSelector(
+    [teamDetailSliceSelector],
+    (teamDetailSlice) => teamDetailSlice.credits
 );

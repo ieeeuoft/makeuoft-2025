@@ -8,6 +8,7 @@
     <thead>
         <tr>
             <th>Item ID</th>
+            <th>Name</th>
             <th>Quantity Requested</th>
         </tr>
     </thead>
@@ -15,6 +16,7 @@
         {% for item in order.hardware %}
             <tr>
                 <td> {{ item.hardware_id }} </td>
+                <td> {{ item.hardware_name }} </td>
                 <td> {{ item.quantity_fulfilled }} </td>
             </tr>
         {% endfor %}

@@ -167,6 +167,11 @@ class OrderListSerializer(serializers.ModelSerializer):
 
 
 class OrderChangeSerializer(OrderListSerializer):
+    # Add an optional field for the cancellation message.
+    cancellation_message = serializers.CharField(
+        required=False, allow_blank=True, write_only=True
+    )
+
     change_options = {
         "Submitted": ["Cancelled", "Ready for Pickup"],
         "Ready for Pickup": ["Picked Up", "Submitted"],
@@ -175,7 +180,8 @@ class OrderChangeSerializer(OrderListSerializer):
 
     class Meta:
         model = Order
-        fields = OrderListSerializer.Meta.fields
+        # Append the new field to your serializer fields.
+        fields = OrderListSerializer.Meta.fields + ("cancellation_message",)
         read_only_fields = (
             "id",
             "hardware",
@@ -200,13 +206,16 @@ class OrderChangeSerializer(OrderListSerializer):
         return data
 
     def update(self, instance: Order, validated_data):
+        # Remove the optional cancellation message from the validated data
+        # so it isn’t passed to the model update.
+        cancellation_message = validated_data.pop("cancellation_message", None)
         status = validated_data.pop("status", None)
-        request = validated_data.pop("request", None)
+        request_field = validated_data.pop("request", None)
 
         if status is not None:
             instance.status = status
-        if request is not None:
-            for item in request:
+        if request_field is not None:
+            for item in request_field:
                 items_in_order = list(
                     OrderItem.objects.filter(hardware=item["id"], order=instance.pk)
                 )
@@ -224,6 +233,9 @@ class OrderChangeSerializer(OrderListSerializer):
                         items_in_order[idx].part_returned_health = None
                     items_in_order[idx].save()
 
+        # (If you want to do something with cancellation_message at the model level,
+        # you could store it in a log or similar here.)
+
         return serializers.ModelSerializer.update(self, instance, validated_data)
 
 
@@ -238,7 +250,29 @@ class OrderCreateSerializer(serializers.Serializer):
         id = serializers.PrimaryKeyRelatedField(
             queryset=Hardware.objects.all(), many=False, required=True
         )
+        hardware_name = serializers.SerializerMethodField()
         quantity = serializers.IntegerField(required=True)
+
+        def get_hardware_name(self, obj):
+            """
+            Handles cases where obj is a dictionary instead of a model instance.
+            """
+            if isinstance(obj, dict):  # Handles case when obj is an OrderedDict
+                hardware = obj.get(
+                    "id"
+                )  # Directly retrieve hardware instance if available
+                if isinstance(hardware, Hardware):  # If it's already a model instance
+                    return hardware.name
+                elif isinstance(hardware, int):  # If it's an ID, fetch from DB
+                    return Hardware.objects.get(id=hardware).name
+                return "Unknown Hardware"
+
+            if isinstance(obj, Hardware):  # If obj is a Hardware model instance
+                return obj.name
+
+            return getattr(obj, "id", None) and getattr(
+                obj.id, "name", "Unknown Hardware"
+            )
 
     hardware = OrderCreateHardwareSerializer(many=True, required=True)
 
@@ -428,15 +462,59 @@ class OrderCreateResponseSerializer(serializers.Serializer):
         hardware_id = serializers.PrimaryKeyRelatedField(
             queryset=Hardware.objects.all(), many=False, required=True
         )
+        hardware_name = serializers.SerializerMethodField()
         quantity_fulfilled = serializers.IntegerField(required=True)
+
+        def get_hardware_name(self, obj):
+            """
+            Handles cases where obj is a dictionary instead of a model instance.
+            """
+            if isinstance(obj, dict):  # Handles case when obj is an OrderedDict
+                hardware = obj.get(
+                    "hardware_id"
+                )  # Directly retrieve hardware instance if available
+                if isinstance(hardware, Hardware):  # If it's already a model instance
+                    return hardware.name
+                elif isinstance(hardware, int):  # If it's an ID, fetch from DB
+                    return Hardware.objects.get(id=hardware).name
+                return "Unknown Hardware"
+
+            if isinstance(obj, Hardware):  # If obj is a Hardware model instance
+                return obj.name
+
+            return getattr(obj, "hardware_id", None) and getattr(
+                obj.id, "name", "Unknown Hardware"
+            )
 
     class OrderCreateResponseErrorSerializer(serializers.Serializer):
         hardware_id = serializers.PrimaryKeyRelatedField(
             queryset=Hardware.objects.all(), many=False, required=True
         )
+        hardware_name = serializers.SerializerMethodField()
         message = serializers.CharField(
             max_length=None, min_length=None, allow_blank=False
         )
+
+        def get_hardware_name(self, obj):
+            """
+            Handles cases where obj is a dictionary instead of a model instance.
+            """
+            if isinstance(obj, dict):  # Handles case when obj is an OrderedDict
+                hardware = obj.get(
+                    "hardware_id"
+                )  # Directly retrieve hardware instance if available
+                if isinstance(hardware, Hardware):  # If it's already a model instance
+                    return hardware.name
+                elif isinstance(hardware, int):  # If it's an ID, fetch from DB
+                    return Hardware.objects.get(id=hardware).name
+                return "Unknown Hardware"
+
+            if isinstance(obj, Hardware):  # If obj is a Hardware model instance
+                return obj.name
+
+            return getattr(obj, "hardware_id", None) and getattr(
+                obj.id, "name", "Unknown Hardware"
+            )
 
     order_id = serializers.PrimaryKeyRelatedField(
         queryset=Order.objects.all(), many=False, allow_null=True
@@ -451,8 +529,33 @@ class OrderItemReturnSerializer(serializers.Serializer):
         id = serializers.PrimaryKeyRelatedField(
             queryset=Hardware.objects.all(), many=False, required=True
         )
+        hardware_name = serializers.SerializerMethodField()
         quantity = serializers.IntegerField(required=True)
         part_returned_health = serializers.CharField(max_length=64, required=True)
+
+        def get_hardware_name(self, obj):
+            """
+            Handles cases where obj is a dictionary instead of a model instance.
+            """
+            if isinstance(obj, dict):  # Handles case when obj is an OrderedDict
+                hardware = obj.get(
+                    "hardware_id"
+                )  # "id" should match the serializer field name
+                if isinstance(hardware, Hardware):  # If it's already a model instance
+                    return hardware.name
+                elif isinstance(hardware, int):  # If it's an ID, fetch from DB
+                    try:
+                        return Hardware.objects.get(id=hardware).name
+                    except Hardware.DoesNotExist:
+                        return "Unknown Hardware"
+                return "Unknown Hardware"
+
+            if hasattr(obj, "hardware_id") and isinstance(
+                obj.hardware_id, Hardware
+            ):  # If obj.id is a Hardware model
+                return obj.hardware_id.name
+
+            return "Unknown Hardware"
 
     hardware = HardwareItemReturnSerializer(many=True, required=True)
     order = serializers.PrimaryKeyRelatedField(
@@ -486,6 +589,9 @@ class OrderItemReturnSerializer(serializers.Serializer):
                 response_data["errors"].append(
                     {
                         "hardware_id": hardware_item["id"].id,
+                        "hardware_name": hardware_item[
+                            "id"
+                        ].name,  # ✅ ADD HARDWARE NAME HERE
                         "message": f"Invalid part health return status for hardware item {hardware_item['id'].name}",
                     }
                 )
@@ -502,6 +608,9 @@ class OrderItemReturnSerializer(serializers.Serializer):
                 response_data["errors"].append(
                     {
                         "hardware_id": hardware_item["id"].id,
+                        "hardware_name": hardware_item[
+                            "id"
+                        ].name,  # ✅ ADD HARDWARE NAME HERE
                         "message": f"There are no checked out items for hardware item {hardware_item['id'].name} for order #{order}.",
                     }
                 )
@@ -513,6 +622,9 @@ class OrderItemReturnSerializer(serializers.Serializer):
                     response_data["errors"].append(
                         {
                             "hardware_id": hardware_item["id"].id,
+                            "hardware_name": hardware_item[
+                                "id"
+                            ].name,  # ✅ ADD HARDWARE NAME HERE
                             "message": f"Requested quantity of {hardware_item['quantity']} for hardware {hardware_item['id'].name} was higher than available. {max_available_quantity} {'was' if max_available_quantity == 1 else 'were'} returned.",
                         }
                     )
@@ -527,6 +639,9 @@ class OrderItemReturnSerializer(serializers.Serializer):
                 response_data["returned_items"].append(
                     {
                         "hardware_id": hardware_item["id"].id,
+                        "hardware_name": hardware_item[
+                            "id"
+                        ].name,  # ✅ ADD HARDWARE NAME HERE
                         "quantity": max_available_quantity,
                     }
                 )
@@ -539,15 +654,62 @@ class OrderItemReturnResponseSerializer(serializers.Serializer):
         hardware_id = serializers.PrimaryKeyRelatedField(
             queryset=Hardware.objects.all(), many=False, required=True
         )
+        hardware_name = serializers.SerializerMethodField()
         message = serializers.CharField(
             max_length=None, min_length=None, allow_blank=False
         )
+
+        def get_hardware_name(self, obj):
+            """
+            Handles cases where obj is a dictionary instead of a model instance.
+            """
+            if isinstance(obj, dict):  # Handles case when obj is an OrderedDict
+                hardware = obj.get(
+                    "hardware_id"
+                )  # "id" should match the serializer field name
+                if isinstance(hardware, Hardware):  # If it's already a model instance
+                    return hardware.name
+                elif isinstance(hardware, int):  # If it's an ID, fetch from DB
+                    try:
+                        return Hardware.objects.get(id=hardware).name
+                    except Hardware.DoesNotExist:
+                        return "Unknown Hardware"
+                return "Unknown Hardware"
+
+            if hasattr(obj, "hardware_id") and isinstance(
+                obj.hardware_id, Hardware
+            ):  # If obj.id is a Hardware model
+                return obj.hardware_id.name
+
+            return "Unknown Hardware"
 
     class OrderReturnResponseReturnItemSerializer(serializers.Serializer):
         hardware_id = serializers.PrimaryKeyRelatedField(
             queryset=Hardware.objects.all(), many=False, required=True
         )
+        hardware_name = serializers.SerializerMethodField()
         quantity = serializers.IntegerField(required=True)
+
+        def get_hardware_name(self, obj):
+            """
+            Handles cases where obj is a dictionary instead of a model instance.
+            """
+            if isinstance(obj, dict):  # Handles case when obj is an OrderedDict
+                hardware = obj.get(
+                    "hardware_id"
+                )  # Directly retrieve hardware instance if available
+                if isinstance(hardware, Hardware):  # If it's already a model instance
+                    return hardware.name
+                elif isinstance(hardware, int):  # If it's an ID, fetch from DB
+                    return Hardware.objects.get(id=hardware).name
+                return "Unknown Hardware"
+
+            if isinstance(obj, Hardware):  # If obj is a Hardware model instance
+                return obj.name
+
+            return getattr(obj, "hardware_id", None) and getattr(
+                obj.id, "name", "Unknown Hardware"
+            )
 
     order_id = serializers.PrimaryKeyRelatedField(
         queryset=Order.objects.all(), many=False, required=True

@@ -7,7 +7,13 @@ import {
 import { OrderStatus } from "api/types";
 import { AppDispatch, RootState } from "slices/store";
 import { get, post, patch } from "api/api";
-import { APIListResponse, Order, OrderInTable, ReturnOrderInTable } from "api/types";
+import {
+    APIListResponse,
+    Order,
+    OrderInTable,
+    ReturnOrderInTable,
+    PartReturnedHealth,
+} from "api/types";
 import { displaySnackbar } from "slices/ui/uiSlice";
 import { teamOrderListSerialization } from "api/helpers";
 
@@ -17,6 +23,7 @@ interface TeamOrderExtraState {
     hardwareIdsToFetch: number[] | null;
     returnedOrders: ReturnOrderInTable[];
     returnedIsLoading: boolean;
+    creditsUsed: number;
 }
 
 export interface UpdateOrderAttributes {
@@ -26,6 +33,7 @@ export interface UpdateOrderAttributes {
         id: number;
         requested_quantity: number;
     }[];
+    cancellation_message?: string;
 }
 
 const extraState: TeamOrderExtraState = {
@@ -34,6 +42,7 @@ const extraState: TeamOrderExtraState = {
     hardwareIdsToFetch: null,
     returnedOrders: [],
     returnedIsLoading: false,
+    creditsUsed: 0,
 };
 
 const teamOrders = createEntityAdapter<OrderInTable>();
@@ -122,7 +131,7 @@ export const returnItems = createAsyncThunk<
                     },
                 })
             );
-            dispatch(getAdminTeamOrders(response.data.team_code));
+            // dispatch(getAdminTeamOrders(response.data.team_code));
             return response.data;
         } catch (e: any) {
             const message =
@@ -166,7 +175,7 @@ export const updateOrderStatus = createAsyncThunk<
                     },
                 })
             );
-            dispatch(getAdminTeamOrders(response.data.team_code));
+            // dispatch(getAdminTeamOrders(response.data.team_code));
             return response.data;
         } catch (e: any) {
             const message =
@@ -206,10 +215,12 @@ const teamOrderSlice = createSlice({
                 checkedOutOrders,
                 returnedOrders,
                 hardwareIdsToFetch,
+                creditsUsed,
             } = teamOrderListSerialization(payload.results);
             teamOrders.setAll(state, [...pendingOrders, ...checkedOutOrders]);
             state.returnedOrders = returnedOrders;
             state.hardwareIdsToFetch = hardwareIdsToFetch;
+            state.creditsUsed = creditsUsed;
         });
         builder.addCase(getAdminTeamOrders.rejected, (state, { payload }) => {
             state.isLoading = false;
@@ -220,11 +231,105 @@ const teamOrderSlice = createSlice({
         builder.addCase(returnItems.pending, (state) => {
             state.returnedIsLoading = true;
         });
-        builder.addCase(returnItems.fulfilled, (state, { payload }) => {
+        builder.addCase(returnItems.fulfilled, (state, { payload, meta }) => {
+            // Mark that the return operation is no longer loading.
             state.returnedIsLoading = false;
+
+            // --- Error Handling ---
+            if (payload.errors && payload.errors.length > 0) {
+                state.error = payload.errors.map((err) => err.message).join(" | ");
+            } else {
+                state.error = null;
+            }
+
+            // --- Update Returned Orders ---
+            if (payload.returned_items && payload.returned_items.length > 0) {
+                const returnItemsData = meta.arg; // ReturnOrderRequest
+
+                const hardwareInOrder = payload.returned_items.map((item) => {
+                    const correspondingRequestItem = returnItemsData.hardware.find(
+                        (hardware) => hardware.id === item.hardware_id
+                    );
+                    const partReturnedHealth: PartReturnedHealth | null =
+                        correspondingRequestItem
+                            ? (correspondingRequestItem.part_returned_health as PartReturnedHealth)
+                            : null;
+
+                    return {
+                        id: item.hardware_id,
+                        hardware_id: item.hardware_id,
+                        quantity: item.quantity,
+                        part_returned_health: partReturnedHealth,
+                        time: `${new Date().toLocaleTimeString()} (${new Date().toDateString()})`,
+                    };
+                });
+
+                const existingReturnedOrder = state.returnedOrders.find(
+                    (order) => order.id === payload.order_id
+                );
+
+                if (existingReturnedOrder) {
+                    hardwareInOrder.forEach((newItem) => {
+                        const existingHardwareItem =
+                            existingReturnedOrder.hardwareInOrder.find(
+                                (existingItem) =>
+                                    existingItem.hardware_id === newItem.hardware_id &&
+                                    existingItem.part_returned_health ===
+                                        newItem.part_returned_health
+                            );
+                        if (existingHardwareItem) {
+                            existingHardwareItem.quantity += newItem.quantity;
+                        } else {
+                            existingReturnedOrder.hardwareInOrder.push(newItem);
+                        }
+                    });
+                } else {
+                    state.returnedOrders.push({
+                        id: payload.order_id,
+                        hardwareInOrder,
+                    });
+                }
+            }
+
+            // --- Update Checked Out Orders in the teamOrders Adapter ---
+            // Find the order entity that is being partially returned.
+            const orderToUpdate = state.entities[payload.order_id];
+            if (orderToUpdate) {
+                // For each hardware row in the order, subtract any returned quantity.
+                // Note: This example assumes that the row.id corresponds to the hardware id.
+                const updatedHardwareInTableRow = orderToUpdate.hardwareInTableRow
+                    .map((row) => {
+                        // Sum up the total returned quantity for this hardware (regardless of part_returned_health,
+                        // since the checked out order row typically doesn’t store health info).
+                        const totalReturnedForHardware = payload.returned_items
+                            .filter((ri) => ri.hardware_id === row.id)
+                            .reduce((sum, ri) => sum + ri.quantity, 0);
+
+                        // Subtract the returned quantity from the quantityGranted.
+                        return {
+                            ...row,
+                            quantityGranted:
+                                row.quantityGranted - totalReturnedForHardware,
+                        };
+                    })
+                    // Remove rows that now have zero quantity.
+                    .filter((row) => row.quantityGranted > 0);
+
+                // Update the order in the adapter.
+                teamOrders.updateOne(state, {
+                    id: payload.order_id,
+                    changes: {
+                        hardwareInTableRow: updatedHardwareInTableRow,
+                    },
+                });
+            }
         });
+
         builder.addCase(returnItems.rejected, (state, { payload }) => {
             state.returnedIsLoading = false;
+            state.error =
+                payload?.message ??
+                "There was a problem returning orders. If this continues please contact hackathon organizers.";
         });
 
         builder.addCase(updateOrderStatus.pending, (state) => {
@@ -237,7 +342,14 @@ const teamOrderSlice = createSlice({
             const { pendingOrders } = teamOrderListSerialization([payload]);
             let updateObject;
             if (pendingOrders.length > 0) {
-                const { hardwareInTableRow } = pendingOrders[0];
+                // Extract the hardware rows and filter out rows where quantityGranted is 0
+                let { hardwareInTableRow } = pendingOrders[0];
+                // Only filter out rows with quantityGranted 0 if the new status is "Picked Up".
+                if (payload.status === "Ready for Pickup") {
+                    hardwareInTableRow = hardwareInTableRow.filter(
+                        (row) => row.quantityGranted > 0
+                    );
+                }
 
                 updateObject = {
                     id: payload.id,
@@ -310,4 +422,9 @@ export const checkedOutOrdersSelector = createSelector(
 export const returnedOrdersSelector = createSelector(
     [teamOrderSliceSelector],
     (teamOrderSlice) => teamOrderSlice.returnedOrders
+);
+
+export const getCreditsUsedSelector = createSelector(
+    [teamOrderSliceSelector],
+    (teamOrderSlice) => teamOrderSlice.creditsUsed
 );
