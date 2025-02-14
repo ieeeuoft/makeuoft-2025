@@ -363,7 +363,7 @@ SIGN_IN_TIMES = [
     {
         "name": "sign_in",
         "description": "Hackathon Sign In",
-        "time": datetime(2025, 2, 15, 9, 0, 0, tzinfo=TZ_INFO),  # Feb 15th @ 9:00am
+        "time": datetime(2025, 2, 13, 23, 0, 0, tzinfo=TZ_INFO),  # Feb 15th @ 9:00am
     },
     {
         "name": "lunch1",
